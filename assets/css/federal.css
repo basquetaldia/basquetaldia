@@ -1,0 +1,90 @@
+:root {
+    --table-header-bg: #292839;
+    --table-row-hover: #f0f2fa;
+    --accent-color: #0050B8;
+    --green: #27ae60;
+    --red: #c0392b;
+    --black: #000;
+    --cool-gray: #8d8bac;
+}
+
+/* --- FILTROS --- */
+.filters-section { background: var(--table-row-hover); padding: 30px 0; border-bottom: 1px solid #ddd; }
+.filter-container { display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.custom-select-wrapper label { font-size: 14px; font-weight: 700; color: var(--accent-color); margin-bottom: 5px; display: block; }
+.custom-select { width: 100%; min-width: 250px; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; background: #fff; font-weight: 600; cursor: pointer; outline: none; }
+.custom-select:focus { border-color: var(--accent-color); }
+
+/* --- LAYOUT --- */
+.stats-grid { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 40px; align-items: start; }
+.stat-card { background: #fff; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 15px; border: 1px solid #eee; }
+.card-header-title { font-family: 'Mulish', sans-serif; font-size: 17px; font-weight: 800; color: var(--table-header-bg); border-left: 5px solid var(--accent-color); padding-left: 15px; margin-bottom: 20px; text-transform: uppercase; }
+
+/* --- ACORDEÓN --- */
+.round-wrapper { margin-bottom: 10px; border-radius: 6px; overflow: hidden; border: 1px solid #eee; }
+.round-header { background-color: var(--table-row-hover); color: var(--table-header-bg); font-weight: 700; padding: 10px 15px; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.round-content { display: none; background: #fff; }
+.round-content.show { display: block; }
+
+/* --- MATCH CARD --- */
+.match-card { background: #fff; border-bottom: 1px solid #eee; margin-bottom: 0; padding-bottom: 0; }
+.match-card:last-child { border-bottom: none; }
+.match-content { padding: 15px; }
+
+.team-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.team-row:last-child { margin-bottom: 0; }
+
+.team-info { display: flex; align-items: center; gap: 12px; width: 70%; }
+.team-logo-match { width: 32px; height: 32px; object-fit: contain; }
+.team-name-match { font-weight: 800; font-size: 1rem; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Score Box */
+.team-score { background-color: #f3f3f3; color: #555; font-weight: 800; font-size: 1.1rem; padding: 5px 12px; border-radius: 6px; min-width: 50px; text-align: center; transition: all 0.2s; }
+.score-win { background-color: var(--accent-color); color: #fff; box-shadow: 0 2px 5px rgba(0, 80, 184, 0.3); }
+
+/* Footer Card */
+.match-footer { background-color: #f9f9f9; border-top: 1px solid #f0f0f0; padding: 8px 15px; font-size: 0.75rem; color: var(--cool-gray); display: flex; justify-content: space-between; align-items: center; }
+.match-day-time { font-weight: 600; color: var(--accent-color); }
+
+/* --- TABLA POSICIONES --- */
+.table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; min-width: 350px; font-size: 0.95rem; }
+thead { background-color: var(--table-header-bg); color: #fff; }
+th { padding: 12px 10px; font-size: 0.9rem; text-transform: uppercase; font-weight: 700; text-align: center; }
+td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; font-weight: 600; color: #444; }
+
+.cell-pos-box { width: 30px; height: 30px; background: #eee; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-weight: 800; border-radius: 4px; margin: 0 auto; color: #333; }
+
+/* --- LÓGICA DE VISIBILIDAD (RESPONSIVE) --- */
+
+/* 1. MÓVIL (Por defecto) */
+.t-logo { display: none; } /* Ocultar Escudo */
+.t-name-full { display: none; } /* Ocultar Nombre Largo */
+.t-name-code { display: block; font-weight: 800; font-size: 1rem; color: #333; letter-spacing: 1px; } /* Mostrar Código */
+
+/* Estilos de columnas */
+.col-pj { color: var(--accent-color); font-weight: 800; }
+.col-pg { color: var(--green); font-weight: 800; }
+.col-pp { color: var(--red); font-weight: 800; }
+.dg-pos { color: var(--green); font-weight: 700; }
+.dg-neg { color: var(--red); font-weight: 700; }
+.dg-neu { color: var(--black); font-weight: 700; }
+
+/* 2. DESKTOP (Pantallas grandes) */
+@media (min-width: 768px) {
+    /* Layout */
+    .stats-grid { grid-template-columns: 1fr 2fr; }
+    
+    /* Configuración de Equipo */
+    .team-cell { display: flex; align-items: center; justify-content: flex-start; gap: 15px; }
+    
+    .t-logo { display: block; width: 35px; height: 35px; object-fit: contain; } /* Mostrar Escudo */
+    .t-name-full { display: block; font-size: 1rem; color: #333; } /* Mostrar Nombre Largo */
+    .t-name-code { display: none; } /* Ocultar Código */
+    
+    .t-left { text-align: left; }
+}
+
+@media (max-width: 992px) {
+    .stats-grid { grid-template-columns: 1fr; }
+}
