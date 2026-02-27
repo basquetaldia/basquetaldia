@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga Proximo - Basquet Al Día</title>
+
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/federal.css">
+
+    <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header" id="header" data-header>
+
+        <div class="container">
+
+            <a href="index.html" class="logo"><img src="assets/img/favicon.png" width="50px"></a>
+            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
+
+            <nav class="navbar">
+
+                <ul class="navbar-list">
+                    <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li>
+                    <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
+                    <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
+                    <li><a href="ligaproximo.html" class="navbar-link">Liga Proximo</a></li>
+                    <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li>
+                </ul>
+
+                <div class="header-actions"><a href="https://www.instagram.com/basquet.al.dia" target="_blank" class="header-action-link">INSTAGRAM</a></div>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <article>
+
+            <section class="hero" id="hero">
+
+                <div class="container">
+
+                    <div class="hero-content">
+
+                        <h1 class="h1 hero-title">Liga Proximo</h1>
+
+                        <p class="form-text" style="align-content: center;">
+                            <span><i class="ri-error-warning-line"></i></span>
+                            LA LIGA DEL FUTURO. CONSULTA TABLA Y RESULTADOS AQUÍ.
+                        </p>
+
+                    </div>
+
+                    <figure class="hero-banner"><img src="assets/image/proximo.svg"></figure>
+
+                </div>
+
+            </section>
+
+            <section class="about" id="stats-section">
+
+                <div class="container">
+
+                    <div class="stats-grid">
+                        
+                        <div class="stat-card">
+
+                            <h3 class="card-header-title">Resultados</h3>
+
+                            <div id="matches-container">
+                                <p style="text-align:center; color:#888; padding: 20px;">Cargando resultados...</p>
+                            </div>
+
+                        </div>
+
+                        <div class="stat-card">
+
+                            <h3 class="card-header-title">Posiciones</h3>
+
+                            <div class="table-responsive">
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>Pos</th>
+                                            <th class="t-left">Equipo</th>
+                                            <th title="Jugados">PJ</th>
+                                            <th title="Ganados">PG</th>
+                                            <th title="Perdidos">PP</th>
+                                            <th title="Puntos a Favor">PF</th>
+                                            <th title="Puntos en Contra">PC</th>
+                                            <th title="Diferencia de Gol">DG</th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="standings-body">
+                                        <tr><td colspan="8" style="color:#888;">Cargando tabla...</td></tr>
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="table-legend">
+                                <div class="legend-item"><span class="dot dot-playoff"></span> Playoffs Directos (1 al 4)</div>
+                                <div class="legend-item"><span class="dot dot-playin"></span> Play-In (5 al 12)</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </article>
+
+    </main>
+
+    <script type="module" src="assets/js/ligaproximo.js"></script>
+    <script src="assets/js/principal.js"></script>
+    
+</body>
+</html>
