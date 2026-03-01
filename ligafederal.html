@@ -12,9 +12,9 @@
     <!-- FAVICON -->
     <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
 
+    <!-- ICON -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
-
 </head>
 <body>
 
@@ -22,7 +22,7 @@
 
         <div class="container">
 
-            <a href="index.html" class="logo"><image src="assets/image/favicon.png" width="50px"></a>
+            <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
             <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
 
             <nav class="navbar">
@@ -35,7 +35,9 @@
                     <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li>
                 </ul>
 
-                <div class="header-actions"><a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a></div>
+                <div class="header-actions">
+                    <a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a>
+                </div>
 
             </nav>
 
@@ -54,6 +56,7 @@
                     <div class="hero-content">
 
                         <h1 class="h1 hero-title">Liga Federal</h1>
+
                         <p class="form-text" style="align-content: center;">
                             <span><i class="ri-error-warning-line"></i></span>
                             LA TERCERA CATEGORÍA DEL BASQUET ARGENTINO. CONSULTA TABLA Y RESULTADOS AQUÍ.
@@ -61,7 +64,7 @@
 
                     </div>
 
-                    <figure class="hero-banner"><image src="assets/image/federal.svg"></figure>
+                    <figure class="hero-banner"><img src="assets/image/federal.svg"></figure>
 
                 </div>
 
@@ -114,7 +117,13 @@
                         
                         <div class="stat-card">
 
-                            <h3 class="card-header-title">Resultados</h3>
+                            <h3 class="card-header-title">Partidos</h3>
+
+                            <div class="custom-select-wrapper" style="margin-bottom: 15px;">
+                                <select id="teamFilterSelect" class="custom-select" style="padding: 8px 12px; font-size: 0.9rem; width: 100%; min-width: auto;" onchange="filterMatchesByTeam()" disabled>
+                                    <option value="">Todos los equipos</option>
+                                </select>
+                            </div>
 
                             <div id="matches-container">
                                 <p style="text-align:center; color:#888;">Selecciona una zona.</p>
@@ -162,7 +171,7 @@
             </section>
 
         </article>
-        
+
     </main>
 
     <footer>
@@ -182,11 +191,9 @@
                     <ul class="social-list">
 
                         <li>
-
                             <a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank">
                                 <i class="ri-links-line"></i>
                             </a>
-
                         </li>
 
                     </ul>
@@ -196,31 +203,12 @@
                 <div class="footer-link-box">
 
                     <ul class="footer-list">
-
-                        <li>
-                            <p class="footer-item-title">Competencias</p>
-                        </li>
-
-                        <li>
-                            <a href="#" class="footer-link">Liga Nacional</a>
-                        </li>
-
-                        <li>
-                            <a href="#" class="footer-link">Liga Argentina</a>
-                        </li>
-
-                        <li>
-                            <a href="ligafederal.html" class="footer-link">Liga Federal</a>
-                        </li>
-
-                        <li>
-                            <a href="#" class="footer-link">Liga Proximo</a>
-                        </li>
-
-                        <li>
-                            <a href="#" class="footer-link">Liga Formativa U21</a>
-                        </li>
-
+                        <li><p class="footer-item-title">Competencias</p></li>
+                        <li><a href="#" class="footer-link">Liga Nacional</a></li>
+                        <li><a href="#" class="footer-link">Liga Argentina</a></li>
+                        <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
+                        <li><a href="#" class="footer-link">Liga Proximo</a></li>
+                        <li><a href="#" class="footer-link">Liga Formativa U21</a></li>
                     </ul>
 
                 </div>
@@ -234,12 +222,9 @@
             <div class="container">
 
                 <center>
-
                     <p class="copyright">
-                        Desarrollado por
-                        <a href="https://www.instagram.com/pedro.miteff" target="_blank"> Pedro Miteff Canal </a>.
+                        Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.
                     </p>
-
                 </center>
 
             </div>
@@ -248,6 +233,48 @@
 
     </footer>
 
+
+    <div id="public-stats-modal" class="hidden">
+
+        <div class="modal-content-stats public-modal">
+
+            <button onclick="closePublicStatsModal()" class="close-modal-btn">X</button>
+
+            <div class="modal-header">
+                <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
+                <div id="ps-match-score" class="ps-score">0 - 0</div>
+            </div>
+            
+            <div id="ps-no-stats" class="hidden" style="text-align:center; padding: 30px; font-weight: 600; color: #888;">
+                <i class="ri-timer-line" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                Las estadísticas detalladas de este partido aún no están disponibles.
+            </div>
+
+            <div id="ps-stats-grid" class="stats-grid-cols">
+
+                <div class="stats-col">
+                    <h3 id="ps-home-name" class="team-title">Local</h3>
+                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
+                    <div id="ps-home-quarters" class="stat-list-public"></div>
+                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
+                    <div id="ps-home-advanced" class="stat-list-public"></div>
+                </div>
+
+                <div class="stats-col">
+                    <h3 id="ps-away-name" class="team-title">Visitante</h3>
+                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
+                    <div id="ps-away-quarters" class="stat-list-public"></div>
+                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
+                    <div id="ps-away-advanced" class="stat-list-public"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
     <script type="module" src="assets/js/federal.js"></script>
     <script src="assets/js/principal.js"></script>
     
