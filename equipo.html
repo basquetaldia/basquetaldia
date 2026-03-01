@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Equipo - Basquet Al Día</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/equipo.css">
+
+    <!-- FAVICON -->
+    <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
+    
+    <!-- ICONS -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+
+</head>
+<body>
+
+    <header class="header" id="header" data-header>
+
+        <div class="container" style="max-width: 1350px !important;">
+
+            <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
+            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
+
+            <nav class="navbar">
+
+                <ul class="navbar-list">
+                    <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li>
+                    <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
+                    <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
+                    <li><a href="ligaproximo.html" class="navbar-link">Liga Proximo</a></li>
+                    <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li>
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <section class="hero" id="hero">
+
+            <div class="container">
+
+                <div class="hero-content">
+                    <h1 class="h1 hero-title" id="t-name">Cargando...</h1>
+                    <h2 id="t-league" style="color: var(--primary); font-family: 'Mulish', sans-serif; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase;">Buscando datos</h2>
+                </div>
+
+                <figure class="hero-banner">
+                    <img id="t-logo" src="assets/image/favicon.png" alt="Escudo del equipo" style="max-height: 250px; width: 100%; object-fit: contain;">
+                </figure>
+
+            </div>
+
+        </section>
+
+        <section class="about" id="stats-section">
+            
+            <div class="container">
+                
+                <div class="dashboard-grid">
+                    
+                    <div>
+
+                        <div class="section-title">Resumen de Temporada</div>
+                        <div class="summary-col">
+                            
+                            <div class="summary-card">
+                                <div class="card-left"><i class="ri-basketball-line stat-icon" style="color:#3498db;"></i><div class="big-stat-lbl">Partidos Jugados</div></div>
+                                <div class="big-stat-val" id="s-pj">0</div>
+                            </div>
+                            
+                            <div class="summary-card">
+                                <div class="card-left"><i class="ri-check-line stat-icon" style="color:#2ecc71;"></i><div class="big-stat-lbl">Partidos Ganados</div></div>
+                                <div class="big-stat-val" id="s-pg" style="color:#2ecc71;">0</div>
+                            </div>
+                            
+                            <div class="summary-card">
+                                <div class="card-left"><i class="ri-close-line stat-icon" style="color:#e74c3c;"></i><div class="big-stat-lbl">Partidos Perdidos</div></div>
+                                <div class="big-stat-val" id="s-pp" style="color:#e74c3c;">0</div>
+                            </div>
+
+                            <div class="summary-card">
+
+                                <div class="card-left">
+
+                                    <i class="ri-fire-line stat-icon" style="color:#f39c12;"></i>
+
+                                    <div>
+                                        <div class="big-stat-lbl">Tiempos Supl.</div>
+                                        <div class="sub-record">Récord: <span id="s-ot-rec" style="font-weight: 800;">0-0</span></div>
+                                    </div>
+
+                                </div>
+
+                                <div class="big-stat-val" id="s-ot-games" style="color:#f39c12;">0</div>
+
+                            </div>
+                            
+                            <div class="summary-card">
+
+                                <div class="card-left">
+
+                                    <i class="ri-arrow-up-circle-fill stat-icon" style="color:#9b59b6;"></i>
+
+                                    <div class="big-stat-lbl">Pts a Favor <br>
+                                        <span style="font-size:0.7rem; color:#888;">(Por Juego)</span>
+                                    </div>
+
+                                </div>
+
+                                <div class="big-stat-val" id="s-ppp">0.0</div>
+
+                            </div>
+                            
+                            <div class="summary-card">
+                                <div class="card-left"><i class="ri-arrow-down-circle-fill stat-icon" style="color:#7f8c8d;"></i><div class="big-stat-lbl">Pts en Contra <br><span style="font-size:0.7rem; color:#888;">(Por Juego)</span></div></div>
+                                <div class="big-stat-val" id="s-pcp">0.0</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="detailed-card">
+
+                        <div class="detailed-title" style="width: 300px;">Puntos por Cuarto</div>
+
+                        <div class="stat-list">
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">1° Cuarto</span>
+                                <span class="stat-value" id="s-q1">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">2° Cuarto</span>
+                                <span class="stat-value" id="s-q2">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">3° Cuarto</span>
+                                <span class="stat-value" id="s-q3">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">4° Cuarto</span>
+                                <span class="stat-value" id="s-q4">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">Suplementario</span>
+                                <span class="stat-value" id="s-ot">0.0</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="detailed-card">
+
+                        <div class="detailed-title">Generales</div>
+
+                        <div class="stat-list">
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">Rebotes Totales</span>
+                                <span class="stat-value" id="s-reb">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">Rebotes Ofensivos</span>
+                                <span class="stat-value" id="s-oreb">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">Asistencias</span>
+                                <span class="stat-value" id="s-ast">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">Robos</span>
+                                <span class="stat-value" id="s-stl">0.0</span>
+                            </div>
+
+                            <div class="stat-list-item">
+                                <span class="stat-label">Pérdidas</span>
+                                <span class="stat-value" id="s-tov">0.0</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div> 
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        <div class="footer-top">
+
+            <div class="container">
+
+                <div class="footer-brand">
+
+                    <a href="#" class="logo">
+                        <image src="assets/image/favicon.png" width="100px">
+                    </a>
+
+                    <p class="footer-text">Seguinos en nuestras redes!</p>
+
+                    <ul class="social-list">
+
+                        <li>
+
+                            <a href="https://www.instagram.com/basquet.al.dia" class="social-link" target="_blank">
+                                <i class="ri-instagram-line"></i>
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-link-box">
+
+                    <ul class="footer-list">
+
+                        <li>
+                            <p class="footer-item-title">Competencias</p>
+                        </li>
+
+                        <li>
+                            <a href="liganacional.html" class="footer-link">Liga Nacional</a>
+                        </li>
+
+                        <li>
+                            <a href="ligaargentina.html" class="footer-link">Liga Argentina</a>
+                        </li>
+
+                        <li>
+                            <a href="ligafederal.html" class="footer-link">Liga Federal</a>
+                        </li>
+
+                        <li>
+                            <a href="ligaproximo.html" class="footer-link">Liga Proximo</a>
+                        </li>
+
+                        <li>
+                            <a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="footer-botton">
+
+            <div class="container">
+
+                <center>
+
+                    <p class="copyright">
+                        Desarrollado por
+                        <a href="https://www.instagram.com/pedro.miteff" target="_blank"> Pedro Miteff Canal </a>.
+                    </p>
+
+                </center>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script type="module" src="assets/js/equipo.js"></script>
+    <script src="assets/js/principal.js"></script>
+
+</body>
+</html>
