@@ -41,31 +41,33 @@ async function initApp()
             localDB = docSnap.data()
             console.log("Datos actualizados desde la base de datos.")
         } 
-        
         else 
         {
             console.log("Base de datos vacía o no encontrada.")
         }
     } 
-    
     catch (error) 
     {
         console.error("Error conectando a la base de datos:", error)
     }
-
 }
 
 initApp()
 
 window.updateZoneOptions = () => 
 {
-
     const confSelect = document.getElementById('conferenceSelect')
     const zoneSelect = document.getElementById('zoneSelect')
+    const teamFilter = document.getElementById('teamFilterSelect')
     const selectedConf = confSelect.value
     
     zoneSelect.innerHTML = '<option value="">Seleccionar Zona...</option>'
     zoneSelect.disabled = true
+    
+    if(teamFilter) {
+        teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
+        teamFilter.disabled = true;
+    }
     
     if (selectedConf && structure[selectedConf]) 
     {
@@ -78,7 +80,6 @@ window.updateZoneOptions = () =>
             option.textContent = z === "Unica" ? "Zona Única" : "Zona " + z
             zoneSelect.appendChild(option)
         })
-
     }
 
     document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888;">Selecciona una zona.</p>'
@@ -97,20 +98,48 @@ window.loadData = () =>
     const zoneTeams = localDB.teams.filter(t => t.zone === searchKey)
     const zoneMatches = localDB.matches.filter(m => m.zone === searchKey)
     
+    const teamFilter = document.getElementById('teamFilterSelect')
+    if (teamFilter) {
+        teamFilter.innerHTML = '<option value="">Todos los equipos</option>'
+        teamFilter.disabled = false
+        
+        zoneTeams.sort((a,b) => a.name.localeCompare(b.name)).forEach(t => {
+            const opt = document.createElement('option')
+            opt.value = t.name
+            opt.textContent = t.name
+            teamFilter.appendChild(opt)
+        })
+    }
+    
     renderMatches(zoneMatches, localDB.teams)
     renderStandings(zoneTeams, zoneMatches)
+}
 
+window.filterMatchesByTeam = () => {
+    const conf = document.getElementById('conferenceSelect').value
+    const zoneCode = document.getElementById('zoneSelect').value
+    const selectedTeam = document.getElementById('teamFilterSelect').value
+    
+    if (!conf || !zoneCode) return
+    const searchKey = `${conf} ${zoneCode}`
+    
+    let filteredMatches = localDB.matches.filter(m => m.zone === searchKey)
+    
+    if (selectedTeam) {
+        filteredMatches = filteredMatches.filter(m => m.home === selectedTeam || m.away === selectedTeam)
+    }
+    
+    renderMatches(filteredMatches, localDB.teams)
 }
 
 function renderMatches(matches, allTeams) 
 {
-
     const container = document.getElementById('matches-container')
     container.innerHTML = ''
     
     if (matches.length === 0) 
     { 
-        container.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">No hay partidos cargados.</p>'
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">No hay partidos cargados para esta selección.</p>'
         return
     }
 
@@ -127,7 +156,6 @@ function renderMatches(matches, allTeams)
 
     rounds.forEach(round => 
     {
-
         const activeClass = isFirst ? 'active' : ''
         const showClass = isFirst ? 'show' : ''
         isFirst = false
@@ -156,29 +184,42 @@ function renderMatches(matches, allTeams)
                 if (aPts > hPts) aClass += ' score-win'
             }
 
+            const hLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(m.home)}`
+            const aLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(m.away)}`
+
+            // 🌟 ESTRUCTURA DEL FOOTER ACTUALIZADA 🌟
             matchesHtml += `
             <div class="match-card">
                 <div class="match-content">
                     <div class="team-row">
-                        <div class="team-info local">
+                        <a href="${hLink}" class="team-info local team-link">
                             <img src="${hLogo}" class="team-logo-match">
                             <span class="team-name-match">${hCode}</span>
-                        </div>
+                        </a>
                         <span class="${hClass}">${m.homePts}</span>
                     </div>
                     <div class="team-row">
-                        <div class="team-info local">
+                        <a href="${aLink}" class="team-info local team-link">
                             <img src="${aLogo}" class="team-logo-match">
                             <span class="team-name-match">${aCode}</span>
-                        </div>
+                        </a>
                         <span class="${aClass}">${m.awayPts}</span>
                     </div>
                 </div>
+                
                 <div class="match-footer">
-                    <div class="match-day-time">
-                        📅 ${dateInfo.dayName} ${dateInfo.dateShort} - ${m.time} Hs
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="match-day-time" style="display: flex; align-items: center; gap: 5px; font-size: 0.85rem;">
+                            <i class="ri-calendar-event-line"></i> ${dateInfo.dayName} ${dateInfo.dateShort} - ${m.time} Hs
+                        </div>
+                        <div style="color: var(--cool-gray); display: flex; align-items: center; gap: 5px; font-size: 0.85rem;">
+                            <i class="ri-map-pin-line" style="color: #d63384; font-size: 0.95rem;"></i> <span style="font-weight:600;">${m.stadium}</span>
+                        </div>
                     </div>
-                    <div style="font-weight:600;">📍 ${m.stadium}</div>
+                    
+                    <button class="btn-view-stats" onclick="openPublicStatsModal('${m.id}')" title="Ver Estadísticas">
+                        <i class="ri-bar-chart-box-line"></i> STATS
+                    </button>
                 </div>
             </div>`
         })
@@ -192,8 +233,65 @@ function renderMatches(matches, allTeams)
                 <div class="round-content ${showClass}">${matchesHtml}</div>
             </div>`
     })
-
 }
+
+window.openPublicStatsModal = (matchId) => {
+    const m = localDB.matches.find(x => String(x.id) === String(matchId));
+    if(!m) return;
+    
+    document.getElementById('ps-match-title').innerText = `${m.home} vs ${m.away}`;
+    document.getElementById('ps-match-score').innerText = `${m.homePts} - ${m.awayPts}`;
+    document.getElementById('ps-home-name').innerText = m.home;
+    document.getElementById('ps-away-name').innerText = m.away;
+    
+    const statsGrid = document.getElementById('ps-stats-grid');
+    const noStatsMsg = document.getElementById('ps-no-stats');
+    
+    if(!m.stats || !m.stats.home || !m.stats.away) {
+        statsGrid.classList.add('hidden');
+        noStatsMsg.classList.remove('hidden');
+    } else {
+        statsGrid.classList.remove('hidden');
+        noStatsMsg.classList.add('hidden');
+        
+        let hQuarters = '', aQuarters = '';
+        const qKeys = ['q1', 'q2', 'q3', 'q4'];
+        const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
+        
+        qKeys.forEach((k, i) => {
+            hQuarters += `<div class="modal-stat-row"><span class="modal-stat-label">${qLabels[i]}</span><span class="modal-stat-value">${m.stats.home[k] || '-'}</span></div>`;
+            aQuarters += `<div class="modal-stat-row"><span class="modal-stat-label">${qLabels[i]}</span><span class="modal-stat-value">${m.stats.away[k] || '-'}</span></div>`;
+        });
+        
+        let otIndex = 1;
+        while(m.stats.home[`ot${otIndex}`] !== undefined || m.stats.away[`ot${otIndex}`] !== undefined) {
+            hQuarters += `<div class="modal-stat-row"><span class="modal-stat-label" style="color:#f39c12;">Suple ${otIndex}</span><span class="modal-stat-value">${m.stats.home[`ot${otIndex}`] || '-'}</span></div>`;
+            aQuarters += `<div class="modal-stat-row"><span class="modal-stat-label" style="color:#f39c12;">Suple ${otIndex}</span><span class="modal-stat-value">${m.stats.away[`ot${otIndex}`] || '-'}</span></div>`;
+            otIndex++;
+        }
+        
+        document.getElementById('ps-home-quarters').innerHTML = hQuarters;
+        document.getElementById('ps-away-quarters').innerHTML = aQuarters;
+        
+        const advKeys = ['reb', 'oreb', 'ast', 'stl', 'tov'];
+        const advLabels = ['Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos', 'Pérdidas'];
+        let hAdv = '', aAdv = '';
+        
+        advKeys.forEach((k, i) => {
+            hAdv += `<div class="modal-stat-row"><span class="modal-stat-label">${advLabels[i]}</span><span class="modal-stat-value">${m.stats.home[k] || '-'}</span></div>`;
+            aAdv += `<div class="modal-stat-row"><span class="modal-stat-label">${advLabels[i]}</span><span class="modal-stat-value">${m.stats.away[k] || '-'}</span></div>`;
+        });
+        
+        document.getElementById('ps-home-advanced').innerHTML = hAdv;
+        document.getElementById('ps-away-advanced').innerHTML = aAdv;
+    }
+    
+    document.getElementById('public-stats-modal').classList.remove('hidden');
+};
+
+window.closePublicStatsModal = () => {
+    document.getElementById('public-stats-modal').classList.add('hidden');
+};
 
 function renderStandings(teams, matches) 
 {
@@ -202,7 +300,7 @@ function renderStandings(teams, matches)
     
     if (teams.length === 0) 
     { 
-        tbody.innerHTML = '<tr><td colspan="8">No hay equipos registrados.</td></tr>'
+        tbody.innerHTML = '<tr><td colspan=\"8\">No hay equipos registrados.</td></tr>'
         return
     }
 
@@ -232,22 +330,17 @@ function renderStandings(teams, matches)
                     standings[hIdx].pg++; standings[hIdx].pts += 2
                     standings[aIdx].pp++; standings[aIdx].pts += 1
                 } 
-                
                 else 
                 { 
                     standings[aIdx].pg++; standings[aIdx].pts += 2 
                     standings[hIdx].pp++; standings[hIdx].pts += 1 
                 }
-
             }
-
         }
-
     })
 
     standings.sort((a, b) => 
     {
-
         if (a.pts !== b.pts) return b.pts - a.pts
         
         const tiedTeams = standings.filter(t => t.pts === a.pts)
@@ -271,20 +364,17 @@ function renderStandings(teams, matches)
                     diffA += (h-v)
                     diffB += (v-h) 
                 }
-
                 else 
                 { 
                     diffA += (v-h)
                     diffB += (h-v)
                 }
-
             })
 
             if (diffA !== diffB) return diffB - diffA
         }
 
         return (b.pf - b.pc) - (a.pf - a.pc)
-
     })
 
     standings.forEach((t, i) => 
@@ -305,29 +395,28 @@ function renderStandings(teams, matches)
         }
         
         const codeName = t.code ? t.code : t.name.substring(0,3).toUpperCase()
+        const teamLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(t.name)}`
 
         const row = `
             <tr>
-                <td><div class="cell-pos-box">${i + 1}</div></td>
-                <td class="t-left">
-                    <div class="team-cell">
-                        <img src="${t.logo}" class="t-logo">
-                        <span class="t-name-full">${t.name}</span>
-                        <span class="t-name-code">${codeName}</span>
-                    </div>
+                <td><div class=\"cell-pos-box\">${i + 1}</div></td>
+                <td class=\"t-left\">
+                    <a href="${teamLink}" class=\"team-cell team-link\">
+                        <img src=\"${t.logo}\" class=\"t-logo\">
+                        <span class=\"t-name-full\">${t.name}</span>
+                        <span class=\"t-name-code\">${codeName}</span>
+                    </a>
                 </td>
-                <td class="col-pj">${t.pj}</td>
-                <td class="col-pg">${t.pg}</td>
-                <td class="col-pp">${t.pp}</td>
+                <td class=\"col-pj\">${t.pj}</td>
+                <td class=\"col-pg\">${t.pg}</td>
+                <td class=\"col-pp\">${t.pp}</td>
                 <td>${t.pf}</td>
                 <td>${t.pc}</td>
-                <td class="${dgClass}">${dgText}</td>
+                <td class=\"${dgClass}\">${dgText}</td>
             </tr>`
 
         tbody.innerHTML += row
-
     })
-
 }
 
 function formatDateInfo(dateString) 
