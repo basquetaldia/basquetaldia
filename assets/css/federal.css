@@ -289,3 +289,42 @@ body.dark-mode .modal-stat-row { border-color: #333; }
 body.dark-mode .modal-stat-label { color: #bbb; }
 .modal-stat-value { font-weight: 800; color: #111; font-size: 1.1rem; }
 body.dark-mode .modal-stat-value { color: #fff; }
+
+.modal-team-logo {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.winner-stat {
+    color: var(--accent-color) !important;
+    font-weight: 900 !important;
+}
+
+.winner-stat i {
+    display: none !important;
+}
+
+body.dark-mode .winner-stat {
+    color: #4dabf7 !important;
+}
+
+.team-name-match {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+}
+
+@media (max-width: 480px) {
+    .team-name-match {
+        max-width: 125px;
+        font-size: 0.85rem;
+    }
+    
+    .team-info {
+        width: 75%;
+    }
+}
