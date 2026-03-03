@@ -168,9 +168,6 @@ function renderMatches(matches, allTeams)
             const hLogo = homeTeam ? homeTeam.logo : defaultLogo
             const aLogo = awayTeam ? awayTeam.logo : defaultLogo
 
-            const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase()
-            const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
-
             const dateInfo = formatDateInfo(m.date)
 
             const hPts = parseInt(m.homePts) || 0
@@ -187,7 +184,9 @@ function renderMatches(matches, allTeams)
             const hLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(m.home)}`
             const aLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(m.away)}`
 
-            // 🌟 ESTRUCTURA DEL FOOTER ACTUALIZADA 🌟
+            const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase()
+            const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
+
             matchesHtml += `
             <div class="match-card">
                 <div class="match-content">
@@ -239,15 +238,23 @@ window.openPublicStatsModal = (matchId) => {
     const m = localDB.matches.find(x => String(x.id) === String(matchId));
     if(!m) return;
     
+    const homeTeam = localDB.teams.find(t => t.name === m.home);
+    const awayTeam = localDB.teams.find(t => t.name === m.away);
+    const hLogo = homeTeam ? homeTeam.logo : defaultLogo;
+    const aLogo = awayTeam ? awayTeam.logo : defaultLogo;
+
     document.getElementById('ps-match-title').innerText = `${m.home} vs ${m.away}`;
     document.getElementById('ps-match-score').innerText = `${m.homePts} - ${m.awayPts}`;
-    document.getElementById('ps-home-name').innerText = m.home;
-    document.getElementById('ps-away-name').innerText = m.away;
+    
+    document.getElementById('ps-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}`;
+    document.getElementById('ps-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}`;
     
     const statsGrid = document.getElementById('ps-stats-grid');
     const noStatsMsg = document.getElementById('ps-no-stats');
     
-    if(!m.stats || !m.stats.home || !m.stats.away) {
+    const hasStats = m.stats && m.stats.home && Object.keys(m.stats.home).length > 0;
+    
+    if(!hasStats) {
         statsGrid.classList.add('hidden');
         noStatsMsg.classList.remove('hidden');
     } else {
@@ -258,15 +265,41 @@ window.openPublicStatsModal = (matchId) => {
         const qKeys = ['q1', 'q2', 'q3', 'q4'];
         const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
         
+        const buildStatRow = (label, hVal, aVal, inverse = false, labelColor = '') => {
+            const hNum = parseInt(hVal);
+            const aNum = parseInt(aVal);
+            
+            let hWin = false;
+            let aWin = false;
+
+            if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) {
+                if (inverse) {
+                    hWin = hNum < aNum;
+                    aWin = aNum < hNum;
+                } else {
+                    hWin = hNum > aNum;
+                    aWin = aNum > hNum;
+                }
+            }
+
+            const lblStyle = labelColor ? `style="color:${labelColor};"` : '';
+            const hRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal || '-'}</span></div>`;
+            const aRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal || '-'}</span></div>`;
+
+            return { hRow, aRow };
+        };
+
         qKeys.forEach((k, i) => {
-            hQuarters += `<div class="modal-stat-row"><span class="modal-stat-label">${qLabels[i]}</span><span class="modal-stat-value">${m.stats.home[k] || '-'}</span></div>`;
-            aQuarters += `<div class="modal-stat-row"><span class="modal-stat-label">${qLabels[i]}</span><span class="modal-stat-value">${m.stats.away[k] || '-'}</span></div>`;
+            const res = buildStatRow(qLabels[i], m.stats.home[k], m.stats.away[k]);
+            hQuarters += res.hRow;
+            aQuarters += res.aRow;
         });
         
         let otIndex = 1;
         while(m.stats.home[`ot${otIndex}`] !== undefined || m.stats.away[`ot${otIndex}`] !== undefined) {
-            hQuarters += `<div class="modal-stat-row"><span class="modal-stat-label" style="color:#f39c12;">Suple ${otIndex}</span><span class="modal-stat-value">${m.stats.home[`ot${otIndex}`] || '-'}</span></div>`;
-            aQuarters += `<div class="modal-stat-row"><span class="modal-stat-label" style="color:#f39c12;">Suple ${otIndex}</span><span class="modal-stat-value">${m.stats.away[`ot${otIndex}`] || '-'}</span></div>`;
+            const res = buildStatRow(`Suple ${otIndex}`, m.stats.home[`ot${otIndex}`], m.stats.away[`ot${otIndex}`], false, '#f39c12');
+            hQuarters += res.hRow;
+            aQuarters += res.aRow;
             otIndex++;
         }
         
@@ -278,8 +311,10 @@ window.openPublicStatsModal = (matchId) => {
         let hAdv = '', aAdv = '';
         
         advKeys.forEach((k, i) => {
-            hAdv += `<div class="modal-stat-row"><span class="modal-stat-label">${advLabels[i]}</span><span class="modal-stat-value">${m.stats.home[k] || '-'}</span></div>`;
-            aAdv += `<div class="modal-stat-row"><span class="modal-stat-label">${advLabels[i]}</span><span class="modal-stat-value">${m.stats.away[k] || '-'}</span></div>`;
+            const isInverse = (k === 'tov'); 
+            const res = buildStatRow(advLabels[i], m.stats.home[k], m.stats.away[k], isInverse);
+            hAdv += res.hRow;
+            aAdv += res.aRow;
         });
         
         document.getElementById('ps-home-advanced').innerHTML = hAdv;
