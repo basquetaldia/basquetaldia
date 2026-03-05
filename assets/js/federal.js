@@ -187,6 +187,15 @@ function renderMatches(matches, allTeams)
             const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase()
             const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
 
+            // LOGICA DE BOTÓN CONDICIONAL: Solo aparece si el partido tiene puntos asignados
+            let statsBtnHtml = '';
+            if (m.homePts !== '-' && m.awayPts !== '-') {
+                statsBtnHtml = `
+                <button class="btn-view-stats" onclick="openPublicStatsModal('${m.id}')" title="Ver Estadísticas">
+                    <i class="ri-bar-chart-box-line"></i> STATS
+                </button>`;
+            }
+
             matchesHtml += `
             <div class="match-card">
                 <div class="match-content">
@@ -216,9 +225,7 @@ function renderMatches(matches, allTeams)
                         </div>
                     </div>
                     
-                    <button class="btn-view-stats" onclick="openPublicStatsModal('${m.id}')" title="Ver Estadísticas">
-                        <i class="ri-bar-chart-box-line"></i> STATS
-                    </button>
+                    ${statsBtnHtml}
                 </div>
             </div>`
         })
@@ -249,77 +256,69 @@ window.openPublicStatsModal = (matchId) => {
     document.getElementById('ps-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}`;
     document.getElementById('ps-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}`;
     
-    const statsGrid = document.getElementById('ps-stats-grid');
-    const noStatsMsg = document.getElementById('ps-no-stats');
+    document.getElementById('ps-stats-grid').classList.remove('hidden');
     
-    const hasStats = m.stats && m.stats.home && Object.keys(m.stats.home).length > 0;
+    const sHome = (m.stats && m.stats.home) ? m.stats.home : {};
+    const sAway = (m.stats && m.stats.away) ? m.stats.away : {};
     
-    if(!hasStats) {
-        statsGrid.classList.add('hidden');
-        noStatsMsg.classList.remove('hidden');
-    } else {
-        statsGrid.classList.remove('hidden');
-        noStatsMsg.classList.add('hidden');
+    let hQuarters = '', aQuarters = '';
+    const qKeys = ['q1', 'q2', 'q3', 'q4'];
+    const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
+    
+    const buildStatRow = (label, hVal, aVal, inverse = false, labelColor = '') => {
+        const hNum = parseInt(hVal);
+        const aNum = parseInt(aVal);
         
-        let hQuarters = '', aQuarters = '';
-        const qKeys = ['q1', 'q2', 'q3', 'q4'];
-        const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
-        
-        const buildStatRow = (label, hVal, aVal, inverse = false, labelColor = '') => {
-            const hNum = parseInt(hVal);
-            const aNum = parseInt(aVal);
-            
-            let hWin = false;
-            let aWin = false;
+        let hWin = false;
+        let aWin = false;
 
-            if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) {
-                if (inverse) {
-                    hWin = hNum < aNum;
-                    aWin = aNum < hNum;
-                } else {
-                    hWin = hNum > aNum;
-                    aWin = aNum > hNum;
-                }
+        if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) {
+            if (inverse) {
+                hWin = hNum < aNum;
+                aWin = aNum < hNum;
+            } else {
+                hWin = hNum > aNum;
+                aWin = aNum > hNum;
             }
-
-            const lblStyle = labelColor ? `style="color:${labelColor};"` : '';
-            const hRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal || '-'}</span></div>`;
-            const aRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal || '-'}</span></div>`;
-
-            return { hRow, aRow };
-        };
-
-        qKeys.forEach((k, i) => {
-            const res = buildStatRow(qLabels[i], m.stats.home[k], m.stats.away[k]);
-            hQuarters += res.hRow;
-            aQuarters += res.aRow;
-        });
-        
-        let otIndex = 1;
-        while(m.stats.home[`ot${otIndex}`] !== undefined || m.stats.away[`ot${otIndex}`] !== undefined) {
-            const res = buildStatRow(`Suple ${otIndex}`, m.stats.home[`ot${otIndex}`], m.stats.away[`ot${otIndex}`], false, '#f39c12');
-            hQuarters += res.hRow;
-            aQuarters += res.aRow;
-            otIndex++;
         }
-        
-        document.getElementById('ps-home-quarters').innerHTML = hQuarters;
-        document.getElementById('ps-away-quarters').innerHTML = aQuarters;
-        
-        const advKeys = ['reb', 'oreb', 'ast', 'stl', 'tov'];
-        const advLabels = ['Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos', 'Pérdidas'];
-        let hAdv = '', aAdv = '';
-        
-        advKeys.forEach((k, i) => {
-            const isInverse = (k === 'tov'); 
-            const res = buildStatRow(advLabels[i], m.stats.home[k], m.stats.away[k], isInverse);
-            hAdv += res.hRow;
-            aAdv += res.aRow;
-        });
-        
-        document.getElementById('ps-home-advanced').innerHTML = hAdv;
-        document.getElementById('ps-away-advanced').innerHTML = aAdv;
+
+        const lblStyle = labelColor ? `style="color:${labelColor};"` : '';
+        const hRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal || '-'}</span></div>`;
+        const aRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal || '-'}</span></div>`;
+
+        return { hRow, aRow };
+    };
+
+    qKeys.forEach((k, i) => {
+        const res = buildStatRow(qLabels[i], sHome[k], sAway[k]);
+        hQuarters += res.hRow;
+        aQuarters += res.aRow;
+    });
+    
+    let otIndex = 1;
+    while(sHome[`ot${otIndex}`] !== undefined || sAway[`ot${otIndex}`] !== undefined) {
+        const res = buildStatRow(`Suple ${otIndex}`, sHome[`ot${otIndex}`], sAway[`ot${otIndex}`], false, '#f39c12');
+        hQuarters += res.hRow;
+        aQuarters += res.aRow;
+        otIndex++;
     }
+    
+    document.getElementById('ps-home-quarters').innerHTML = hQuarters;
+    document.getElementById('ps-away-quarters').innerHTML = aQuarters;
+    
+    const advKeys = ['reb', 'oreb', 'ast', 'stl', 'tov'];
+    const advLabels = ['Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos', 'Pérdidas'];
+    let hAdv = '', aAdv = '';
+    
+    advKeys.forEach((k, i) => {
+        const isInverse = (k === 'tov'); 
+        const res = buildStatRow(advLabels[i], sHome[k], sAway[k], isInverse);
+        hAdv += res.hRow;
+        aAdv += res.aRow;
+    });
+    
+    document.getElementById('ps-home-advanced').innerHTML = hAdv;
+    document.getElementById('ps-away-advanced').innerHTML = aAdv;
     
     document.getElementById('public-stats-modal').classList.remove('hidden');
 };
