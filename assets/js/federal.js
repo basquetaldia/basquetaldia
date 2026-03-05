@@ -181,13 +181,9 @@ function renderMatches(matches, allTeams)
                 if (aPts > hPts) aClass += ' score-win'
             }
 
-            const hLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(m.home)}`
-            const aLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(m.away)}`
-
             const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase()
             const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
 
-            // LOGICA DE BOTÓN CONDICIONAL: Solo aparece si el partido tiene puntos asignados
             let statsBtnHtml = '';
             if (m.homePts !== '-' && m.awayPts !== '-') {
                 statsBtnHtml = `
@@ -200,17 +196,17 @@ function renderMatches(matches, allTeams)
             <div class="match-card">
                 <div class="match-content">
                     <div class="team-row">
-                        <a href="${hLink}" class="team-info local team-link">
+                        <div class="team-info local team-link" onclick="openComparisonModal('${m.id}')">
                             <img src="${hLogo}" class="team-logo-match">
                             <span class="team-name-match">${hCode}</span>
-                        </a>
+                        </div>
                         <span class="${hClass}">${m.homePts}</span>
                     </div>
                     <div class="team-row">
-                        <a href="${aLink}" class="team-info local team-link">
+                        <div class="team-info local team-link" onclick="openComparisonModal('${m.id}')">
                             <img src="${aLogo}" class="team-logo-match">
                             <span class="team-name-match">${aCode}</span>
-                        </a>
+                        </div>
                         <span class="${aClass}">${m.awayPts}</span>
                     </div>
                 </div>
@@ -240,6 +236,209 @@ function renderMatches(matches, allTeams)
             </div>`
     })
 }
+
+window.toggleCompStats = (view) => {
+    if(view === 'afavor') {
+        document.getElementById('btn-afavor').classList.add('active');
+        document.getElementById('btn-encontra').classList.remove('active');
+        
+        document.getElementById('comp-home-stats-afavor').style.display = 'block';
+        document.getElementById('comp-away-stats-afavor').style.display = 'block';
+        
+        document.getElementById('comp-home-stats-encontra').style.display = 'none';
+        document.getElementById('comp-away-stats-encontra').style.display = 'none';
+    } else {
+        document.getElementById('btn-encontra').classList.add('active');
+        document.getElementById('btn-afavor').classList.remove('active');
+        
+        document.getElementById('comp-home-stats-encontra').style.display = 'block';
+        document.getElementById('comp-away-stats-encontra').style.display = 'block';
+        
+        document.getElementById('comp-home-stats-afavor').style.display = 'none';
+        document.getElementById('comp-away-stats-afavor').style.display = 'none';
+    }
+};
+
+function getTeamSeasonStats(teamName) {
+    let gamesPlayed = 0;
+    let statsGames = 0;
+    let wins = 0;
+    let losses = 0;
+    
+    let totals = { 
+        pts: 0, opp_pts: 0,
+        reb: 0, oreb: 0, ast: 0, stl: 0, tov: 0, 
+        q1: 0, q2: 0, q3: 0, q4: 0,
+        opp_q1: 0, opp_q2: 0, opp_q3: 0, opp_q4: 0
+    };
+
+    localDB.matches.forEach(m => {
+        if (m.homePts === '-' || m.awayPts === '-') return; 
+
+        let isHome = m.home === teamName;
+        let isAway = m.away === teamName;
+
+        if (isHome || isAway) {
+            gamesPlayed++;
+            let myPts = parseInt(isHome ? m.homePts : m.awayPts) || 0;
+            let oppPts = parseInt(isHome ? m.awayPts : m.homePts) || 0;
+            
+            totals.pts += myPts;
+            totals.opp_pts += oppPts;
+            
+            if (myPts > oppPts) wins++;
+            else if (myPts < oppPts) losses++;
+
+            let teamStats = null;
+            let oppStats = null;
+            if (m.stats) {
+                teamStats = isHome ? m.stats.home : m.stats.away;
+                oppStats = isHome ? m.stats.away : m.stats.home;
+            }
+
+            if (teamStats && Object.keys(teamStats).length > 0) {
+                statsGames++;
+                totals.reb += parseInt(teamStats.reb) || 0;
+                totals.oreb += parseInt(teamStats.oreb) || 0;
+                totals.ast += parseInt(teamStats.ast) || 0;
+                totals.stl += parseInt(teamStats.stl) || 0;
+                totals.tov += parseInt(teamStats.tov) || 0;
+                
+                totals.q1 += parseInt(teamStats.q1) || 0;
+                totals.q2 += parseInt(teamStats.q2) || 0;
+                totals.q3 += parseInt(teamStats.q3) || 0;
+                totals.q4 += parseInt(teamStats.q4) || 0;
+            }
+            
+            if (oppStats && Object.keys(oppStats).length > 0) {
+                totals.opp_q1 += parseInt(oppStats.q1) || 0;
+                totals.opp_q2 += parseInt(oppStats.q2) || 0;
+                totals.opp_q3 += parseInt(oppStats.q3) || 0;
+                totals.opp_q4 += parseInt(oppStats.q4) || 0;
+            }
+        }
+    });
+
+    return {
+        record: `${wins}-${losses}`,
+        pts: gamesPlayed > 0 ? (totals.pts / gamesPlayed).toFixed(1) : '-',
+        opp_pts: gamesPlayed > 0 ? (totals.opp_pts / gamesPlayed).toFixed(1) : '-',
+        
+        q1: statsGames > 0 ? (totals.q1 / statsGames).toFixed(1) : '-',
+        q2: statsGames > 0 ? (totals.q2 / statsGames).toFixed(1) : '-',
+        q3: statsGames > 0 ? (totals.q3 / statsGames).toFixed(1) : '-',
+        q4: statsGames > 0 ? (totals.q4 / statsGames).toFixed(1) : '-',
+        
+        opp_q1: statsGames > 0 ? (totals.opp_q1 / statsGames).toFixed(1) : '-',
+        opp_q2: statsGames > 0 ? (totals.opp_q2 / statsGames).toFixed(1) : '-',
+        opp_q3: statsGames > 0 ? (totals.opp_q3 / statsGames).toFixed(1) : '-',
+        opp_q4: statsGames > 0 ? (totals.opp_q4 / statsGames).toFixed(1) : '-',
+        
+        reb: statsGames > 0 ? (totals.reb / statsGames).toFixed(1) : '-',
+        oreb: statsGames > 0 ? (totals.oreb / statsGames).toFixed(1) : '-',
+        ast: statsGames > 0 ? (totals.ast / statsGames).toFixed(1) : '-',
+        stl: statsGames > 0 ? (totals.stl / statsGames).toFixed(1) : '-',
+        tov: statsGames > 0 ? (totals.tov / statsGames).toFixed(1) : '-'
+    };
+}
+
+window.openComparisonModal = (matchId) => {
+    const m = localDB.matches.find(x => String(x.id) === String(matchId));
+    if(!m) return;
+
+    window.toggleCompStats('afavor');
+
+    const homeTeam = localDB.teams.find(t => t.name === m.home);
+    const awayTeam = localDB.teams.find(t => t.name === m.away);
+    const hLogo = homeTeam ? homeTeam.logo : defaultLogo;
+    const aLogo = awayTeam ? awayTeam.logo : defaultLogo;
+
+    const hStats = getTeamSeasonStats(m.home);
+    const aStats = getTeamSeasonStats(m.away);
+
+    document.getElementById('comp-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${hStats.record}</span>`;
+    document.getElementById('comp-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${aStats.record}</span>`;
+
+    const buildCompRow = (label, hVal, aVal, inverse = false) => {
+        const hNum = parseFloat(hVal);
+        const aNum = parseFloat(aVal);
+
+        let hWin = false;
+        let aWin = false;
+
+        if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) {
+            if (inverse) {
+                hWin = hNum < aNum;
+                aWin = aNum < hNum;
+            } else {
+                hWin = hNum > aNum;
+                aWin = aNum > hNum;
+            }
+        }
+
+        const hRow = `<div class="modal-stat-row"><span class="modal-stat-label">${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal}</span></div>`;
+        const aRow = `<div class="modal-stat-row"><span class="modal-stat-label">${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal}</span></div>`;
+
+        return { hRow, aRow };
+    };
+
+    /* --- BLOQUE: A FAVOR --- */
+    let hAFavor = '<h4 class="stat-section-title"><i class="ri-timer-line"></i> A Favor x Cuarto</h4>';
+    let aAFavor = '<h4 class="stat-section-title"><i class="ri-timer-line"></i> A Favor x Cuarto</h4>';
+    
+    const qKeys = ['q1', 'q2', 'q3', 'q4'];
+    const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
+    qKeys.forEach((k, i) => {
+        const res = buildCompRow(qLabels[i], hStats[k], aStats[k]);
+        hAFavor += res.hRow;
+        aAFavor += res.aRow;
+    });
+
+    hAFavor += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-bar-chart-box-line"></i> Generales (Positivas)</h4>';
+    aAFavor += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-bar-chart-box-line"></i> Generales (Positivas)</h4>';
+
+    const posKeys = ['pts', 'reb', 'oreb', 'ast', 'stl'];
+    const posLabels = ['Puntos a Favor', 'Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos'];
+    posKeys.forEach((k, i) => {
+        const res = buildCompRow(posLabels[i], hStats[k], aStats[k]);
+        hAFavor += res.hRow;
+        aAFavor += res.aRow;
+    });
+
+    /* --- BLOQUE: EN CONTRA --- */
+    let hEnContra = '<h4 class="stat-section-title"><i class="ri-shield-line"></i> En Contra x Cuarto</h4>';
+    let aEnContra = '<h4 class="stat-section-title"><i class="ri-shield-line"></i> En Contra x Cuarto</h4>';
+    
+    const oppQKeys = ['opp_q1', 'opp_q2', 'opp_q3', 'opp_q4'];
+    oppQKeys.forEach((k, i) => {
+        const res = buildCompRow(qLabels[i], hStats[k], aStats[k], true);
+        hEnContra += res.hRow;
+        aEnContra += res.aRow;
+    });
+
+    hEnContra += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-error-warning-line"></i> Generales (Negativas)</h4>';
+    aEnContra += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-error-warning-line"></i> Generales (Negativas)</h4>';
+
+    const negKeys = ['opp_pts', 'tov'];
+    const negLabels = ['Puntos en Contra', 'Pérdidas'];
+    negKeys.forEach((k, i) => {
+        const res = buildCompRow(negLabels[i], hStats[k], aStats[k], true);
+        hEnContra += res.hRow;
+        aEnContra += res.aRow;
+    });
+
+    document.getElementById('comp-home-stats-afavor').innerHTML = hAFavor;
+    document.getElementById('comp-away-stats-afavor').innerHTML = aAFavor;
+    
+    document.getElementById('comp-home-stats-encontra').innerHTML = hEnContra;
+    document.getElementById('comp-away-stats-encontra').innerHTML = aEnContra;
+
+    document.getElementById('comparison-modal').classList.remove('hidden');
+};
+
+window.closeComparisonModal = () => {
+    document.getElementById('comparison-modal').classList.add('hidden');
+};
 
 window.openPublicStatsModal = (matchId) => {
     const m = localDB.matches.find(x => String(x.id) === String(matchId));
@@ -435,7 +634,7 @@ function renderStandings(teams, matches)
             <tr>
                 <td><div class=\"cell-pos-box\">${i + 1}</div></td>
                 <td class=\"t-left\">
-                    <a href="${teamLink}" class=\"team-cell team-link\">
+                    <a href="${teamLink}" target="_blank" class=\"team-cell team-link\">
                         <img src=\"${t.logo}\" class=\"t-logo\">
                         <span class=\"t-name-full\">${t.name}</span>
                         <span class=\"t-name-code\">${codeName}</span>
