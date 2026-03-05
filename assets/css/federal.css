@@ -328,3 +328,117 @@ body.dark-mode .winner-stat {
         width: 75%;
     }
 }
+
+.stats-toggle-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    background: #f3f3f3;
+    padding: 5px;
+    border-radius: 8px;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.dark-mode .stats-toggle-container {
+    background: #2a2a2a;
+}
+
+.stats-toggle-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    color: var(--cool-gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.stats-toggle-btn.active {
+    background: var(--accent-color);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+body.dark-mode .stats-toggle-btn.active {
+    background: #4dabf7;
+    color: #1e1e1e;
+}
+
+#comparison-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 1000;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+#comparison-modal.hidden { 
+    display: none; 
+}
+
+.team-name-match {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block;
+    max-width: 150px;
+    vertical-align: middle;
+}
+
+@media (max-width: 480px) {
+    .team-name-match {
+        max-width: 100px; 
+    }
+}
+
+.team-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100%;
+    padding: 0 5px;
+}
+
+.bp-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: var(--red);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    width: fit-content;
+    margin: 30px auto 0 auto;
+    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3);
+}
+
+.bp-badge i {
+    display: flex;
+    font-size: 1.2rem;
+}
+
+.bp-preview {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--red);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+.bp-preview i {
+    display: flex;
+    font-size: 1rem;
+}
