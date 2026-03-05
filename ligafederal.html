@@ -23,7 +23,9 @@
         <div class="container">
 
             <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
-            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
+            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn>
+                <i class="ri-menu-line"></i>
+            </button>
 
             <nav class="navbar">
 
@@ -155,7 +157,9 @@
                                     </thead>
 
                                     <tbody id="standings-body">
-                                        <tr><td colspan="8" style="color:#888;">Esperando selección...</td></tr>
+                                        <tr>
+                                            <td colspan="8" style="color:#888;">Esperando selección...</td>
+                                        </tr>
                                     </tbody>
 
                                 </table>
@@ -189,13 +193,11 @@
                     <p class="footer-text">Seguinos en nuestras redes!</p>
 
                     <ul class="social-list">
-
                         <li>
                             <a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank">
                                 <i class="ri-links-line"></i>
                             </a>
                         </li>
-
                     </ul>
 
                 </div>
@@ -233,7 +235,6 @@
 
     </footer>
 
-
     <div id="public-stats-modal" class="hidden">
 
         <div class="modal-content-stats public-modal">
@@ -244,7 +245,7 @@
                 <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
                 <div id="ps-match-score" class="ps-score">0 - 0</div>
             </div>
-
+            
             <div id="ps-stats-grid" class="stats-grid-cols">
 
                 <div class="stats-col">
@@ -263,6 +264,50 @@
                     <div id="ps-away-advanced" class="stat-list-public"></div>
                 </div>
 
+            </div>
+            
+            <div class="bp-badge">
+                <i class="ri-tv-2-line"></i> Transmisión por BasquetPass.tv
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="comparison-modal" class="hidden">
+
+        <div class="modal-content-stats public-modal">
+
+            <button onclick="closeComparisonModal()" class="close-modal-btn">X</button>
+
+            <div class="modal-header">
+                <h2 style="margin-bottom: 5px;"><i class="ri-scales-3-line"></i> Comparativa de Equipos</h2>
+                <div class="ps-score" style="font-size: 1.1rem; color: var(--cool-gray);">Promedios de Temporada</div>
+            </div>
+            
+            <div class="stats-toggle-container">
+                <button class="stats-toggle-btn active" id="btn-afavor" onclick="toggleCompStats('afavor')">A Favor</button>
+                <button class="stats-toggle-btn" id="btn-encontra" onclick="toggleCompStats('encontra')">En Contra</button>
+            </div>
+
+            <div class="stats-grid-cols">
+
+                <div class="stats-col">
+                    <h3 id="comp-home-name" class="team-title">Local</h3>
+                    <div id="comp-home-stats-afavor" class="stat-list-public"></div>
+                    <div id="comp-home-stats-encontra" class="stat-list-public hidden"></div>
+                </div>
+
+                <div class="stats-col">
+                    <h3 id="comp-away-name" class="team-title">Visitante</h3>
+                    <div id="comp-away-stats-afavor" class="stat-list-public"></div>
+                    <div id="comp-away-stats-encontra" class="stat-list-public hidden"></div>
+                </div>
+
+            </div>
+            
+            <div class="bp-badge">
+                <i class="ri-tv-2-line"></i> Transmisión por BasquetPass.tv
             </div>
 
         </div>
