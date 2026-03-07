@@ -569,6 +569,7 @@ function renderStandings(teams, matches)
                 standings[hIdx].pf += hPts; standings[hIdx].pc += aPts
                 standings[aIdx].pf += aPts; standings[aIdx].pc += hPts
 
+                // Se suman los puntos FIBA invisibles (2 por victoria, 1 por derrota)
                 if (hPts > aPts) 
                 { 
                     standings[hIdx].pg++; standings[hIdx].pts += 2
@@ -583,18 +584,18 @@ function renderStandings(teams, matches)
         }
     })
 
-    // Calculamos el porcentaje de victorias
+    // Se calcula el %V solo para mostrarlo
     standings.forEach(t => {
         t.pct = t.pj > 0 ? (t.pg / t.pj) : 0;
     });
 
     standings.sort((a, b) => 
     {
-        // 1. Odenamos por %V
-        if (b.pct !== a.pct) return b.pct - a.pct;
+        // 1. ORDEN PRINCIPAL: Puntos FIBA (Invisibles)
+        if (a.pts !== b.pts) return b.pts - a.pts
         
-        // 2. Si hay empate de porcentaje, buscar los equipos empatados
-        const tiedTeams = standings.filter(t => t.pct === a.pct)
+        // 2. Si hay empate en Puntos FIBA, buscar los equipos empatados
+        const tiedTeams = standings.filter(t => t.pts === a.pts)
 
         if (tiedTeams.length >= 2) 
         {
@@ -622,6 +623,7 @@ function renderStandings(teams, matches)
                 }
             })
 
+            // Desempate por enfrentamientos entre ellos
             if (diffA !== diffB) return diffB - diffA
         }
 
