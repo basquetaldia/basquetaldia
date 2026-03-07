@@ -83,7 +83,7 @@ window.updateZoneOptions = () =>
     }
 
     document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888;">Selecciona una zona.</p>'
-    document.getElementById('standings-body').innerHTML = '<tr><td colspan="8" style="color:#888;">Esperando selección...</td></tr>'
+    document.getElementById('standings-body').innerHTML = '<tr><td colspan="9" style="color:#888;">Esperando selección...</td></tr>'
 }
 
 window.loadData = () => 
@@ -519,6 +519,17 @@ window.openPublicStatsModal = (matchId) => {
     document.getElementById('ps-home-advanced').innerHTML = hAdv;
     document.getElementById('ps-away-advanced').innerHTML = aAdv;
     
+    const cabbBtnContainer = document.getElementById('cabb-btn-container');
+    if (cabbBtnContainer) {
+        if (m.cabbLink && m.cabbLink.trim() !== '') {
+            cabbBtnContainer.innerHTML = `<a href="${m.cabbLink}" target="_blank" class="cabb-link-btn" title="Ver Estadísticas Individuales"><i class="ri-user-star-line" style="font-size:1.2rem;"></i> Ver Individuales CABB</a>`;
+            cabbBtnContainer.style.display = 'block';
+        } else {
+            cabbBtnContainer.innerHTML = '';
+            cabbBtnContainer.style.display = 'none';
+        }
+    }
+
     document.getElementById('public-stats-modal').classList.remove('hidden');
 };
 
@@ -533,13 +544,13 @@ function renderStandings(teams, matches)
     
     if (teams.length === 0) 
     { 
-        tbody.innerHTML = '<tr><td colspan=\"8\">No hay equipos registrados.</td></tr>'
+        tbody.innerHTML = '<tr><td colspan=\"9\">No hay equipos registrados.</td></tr>'
         return
     }
 
     let standings = teams.map(t => ({
         name: t.name, code: t.code, logo: t.logo,
-        pj: 0, pg: 0, pp: 0, pf: 0, pc: 0, pts: 0
+        pj: 0, pg: 0, pp: 0, pf: 0, pc: 0, pts: 0, pct: 0
     }))
 
     matches.forEach(m => 
@@ -572,11 +583,18 @@ function renderStandings(teams, matches)
         }
     })
 
+    // Calculamos el porcentaje de victorias
+    standings.forEach(t => {
+        t.pct = t.pj > 0 ? (t.pg / t.pj) : 0;
+    });
+
     standings.sort((a, b) => 
     {
-        if (a.pts !== b.pts) return b.pts - a.pts
+        // 1. Odenamos por %V
+        if (b.pct !== a.pct) return b.pct - a.pct;
         
-        const tiedTeams = standings.filter(t => t.pts === a.pts)
+        // 2. Si hay empate de porcentaje, buscar los equipos empatados
+        const tiedTeams = standings.filter(t => t.pct === a.pct)
 
         if (tiedTeams.length >= 2) 
         {
@@ -607,6 +625,7 @@ function renderStandings(teams, matches)
             if (diffA !== diffB) return diffB - diffA
         }
 
+        // 3. Desempate final por diferencia de gol general
         return (b.pf - b.pc) - (a.pf - a.pc)
     })
 
@@ -629,6 +648,9 @@ function renderStandings(teams, matches)
         
         const codeName = t.code ? t.code : t.name.substring(0,3).toUpperCase()
         const teamLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(t.name)}`
+        
+        // Damos formato visual al número (Ejemplo: 0.500)
+        const pctDisplay = t.pct.toFixed(3);
 
         const row = `
             <tr>
@@ -643,6 +665,7 @@ function renderStandings(teams, matches)
                 <td class=\"col-pj\">${t.pj}</td>
                 <td class=\"col-pg\">${t.pg}</td>
                 <td class=\"col-pp\">${t.pp}</td>
+                <td style=\"font-weight: 800; color: var(--accent-color);\">${pctDisplay}</td>
                 <td>${t.pf}</td>
                 <td>${t.pc}</td>
                 <td class=\"${dgClass}\">${dgText}</td>
