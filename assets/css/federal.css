@@ -58,6 +58,7 @@
     gap: 30px; 
     margin-top: 40px; 
     align-items: start; 
+    max-width: 100%; /* Previene desborde en móviles */
 }
 
 .stat-card 
@@ -67,6 +68,11 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
     padding: 15px; 
     border: 1px solid #eee; 
+    
+    /* MAGIA PARA ARREGLAR EL ANCHO EN MÓVILES */
+    min-width: 0; 
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .card-header-title 
@@ -137,18 +143,37 @@
 
 .team-info { display: flex; align-items: center; gap: 12px; width: 70%; }
 .team-logo-match { width: 32px; height: 32px; object-fit: contain; }
-.team-name-match { font-weight: 800; font-size: 1rem; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Letra ajustada para evitar que empuje en celulares */
+.team-name-match { 
+    font-weight: 800; 
+    font-size: 1rem; 
+    color: #444; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block;
+    max-width: 150px;
+    vertical-align: middle;
+}
 
 /* Score Box */
 .team-score { background-color: #f3f3f3; color: #555; font-weight: 800; font-size: 1.1rem; padding: 5px 12px; border-radius: 6px; min-width: 50px; text-align: center; transition: all 0.2s; }
 .score-win { background-color: var(--accent-color); color: #fff; box-shadow: 0 2px 5px rgba(0, 80, 184, 0.3); }
 
 /* Footer Card */
-.match-footer { background-color: #f9f9f9; border-top: 1px solid #f0f0f0; padding: 8px 15px; font-size: 0.75rem; color: var(--cool-gray); display: flex; justify-content: space-between; align-items: center; }
+.match-footer { background-color: #f9f9f9; border-top: 1px solid #f0f0f0; padding: 8px 15px; font-size: 0.75rem; color: var(--cool-gray); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .match-day-time { font-weight: 600; color: var(--accent-color); }
 
 /* --- TABLA POSICIONES --- */
-.table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-responsive { 
+    width: 100%; 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+}
+
 table { width: 100%; border-collapse: collapse; min-width: 350px; font-size: 0.95rem; }
 thead { background-color: var(--table-header-bg); color: #fff; }
 th { padding: 12px 10px; font-size: 0.9rem; text-transform: uppercase; font-weight: 700; text-align: center; }
@@ -157,13 +182,10 @@ td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #eee; vert
 .cell-pos-box { width: 30px; height: 30px; background: #eee; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-weight: 800; border-radius: 4px; margin: 0 auto; color: #333; }
 
 /* --- LÓGICA DE VISIBILIDAD (RESPONSIVE) --- */
+.t-logo { display: none; } 
+.t-name-full { display: none; } 
+.t-name-code { display: block; font-weight: 800; font-size: 1rem; color: #333; letter-spacing: 1px; }
 
-/* 1. MÓVIL (Por defecto) */
-.t-logo { display: none; } /* Ocultar Escudo */
-.t-name-full { display: none; } /* Ocultar Nombre Largo */
-.t-name-code { display: block; font-weight: 800; font-size: 1rem; color: #333; letter-spacing: 1px; } /* Mostrar Código */
-
-/* Estilos de columnas */
 .col-pj { color: var(--accent-color); font-weight: 800; }
 .col-pg { color: var(--green); font-weight: 800; }
 .col-pp { color: var(--red); font-weight: 800; }
@@ -186,11 +208,10 @@ td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #eee; vert
     .stats-grid { grid-template-columns: 1fr; }
 }
 
-.team-link 
-{
-    text-decoration: none !important;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+@media (max-width: 480px) {
+    .team-name-match { max-width: 100px; }
+    .stat-card { padding: 10px; } /* Gana espacio de los bordes en pantallas chicas */
+    .match-content { padding: 12px 10px; }
 }
 
 .team-link 
@@ -311,26 +332,9 @@ body.dark-mode .winner-stat {
     color: #4dabf7 !important;
 }
 
-.team-name-match {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 170px;
-}
-
-@media (max-width: 480px) {
-    .team-name-match {
-        max-width: 125px;
-        font-size: 0.85rem;
-    }
-    
-    .team-info {
-        width: 75%;
-    }
-}
-
 .stats-toggle-container {
     display: flex;
+    flex-wrap: wrap; /* Arreglo para móvil: permite que bajen los botones si no entran */
     justify-content: center;
     gap: 10px;
     margin-bottom: 25px;
@@ -338,6 +342,7 @@ body.dark-mode .winner-stat {
     padding: 5px;
     border-radius: 8px;
     width: max-content;
+    max-width: 100%; /* Arreglo para móvil: evita estirar la tarjeta */
     margin-left: auto;
     margin-right: auto;
 }
@@ -378,21 +383,6 @@ body.dark-mode .stats-toggle-btn.active {
 
 #comparison-modal.hidden { 
     display: none; 
-}
-
-.team-name-match {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: inline-block;
-    max-width: 150px;
-    vertical-align: middle;
-}
-
-@media (max-width: 480px) {
-    .team-name-match {
-        max-width: 100px; 
-    }
 }
 
 .team-title {
