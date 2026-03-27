@@ -12,7 +12,7 @@
     <!-- FAVICON -->
     <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
 
-    <!-- ICONS -->
+    <!-- ICON -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
 </head>
@@ -21,8 +21,11 @@
     <header class="header" id="header" data-header>
 
         <div class="container">
+            
+            <a href="index.html" class="logo">
+                <img src="assets/image/favicon.png" width="50px">
+            </a>
 
-            <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
             <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn>
                 <i class="ri-menu-line"></i>
             </button>
@@ -30,27 +33,11 @@
             <nav class="navbar">
 
                 <ul class="navbar-list">
-
-                    <!-- <li>
-                        <a href="liganacional.html" class="navbar-link">Liga Nacional</a>
-                    </li> -->
-
-                    <!-- <li>
-                        <a href="ligaargentina.html" class="navbar-link">Liga Argentina</a>
-                    </li> -->
-
-                    <li>
-                        <a href="ligafederal.html" class="navbar-link">Liga Federal</a>
-                    </li>
-
-                    <li>
-                        <a href="premetro.html" class="navbar-link">Pre Liga Metropolitana</a>
-                    </li>
-
-                    <!-- <li>
-                        <a href="formativau21.html" class="navbar-link">Liga Formativa U21</a>
-                    </li> -->
-
+                    <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li>
+                    <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
+                    <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
+                    <li><a href="ligaproximo.html" class="navbar-link">Liga Proximo</a></li>
+                    <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li>
                 </ul>
 
                 <div class="header-actions">
@@ -74,7 +61,6 @@
                     <div class="hero-content">
 
                         <h1 class="h1 hero-title">Liga Federal</h1>
-
                         <p class="form-text" style="align-content: center;">
                             <span><i class="ri-error-warning-line"></i></span>
                             LA TERCERA CATEGORÍA DEL BASQUET ARGENTINO. CONSULTA TABLA Y RESULTADOS AQUÍ.
@@ -92,7 +78,7 @@
 
                 <div class="container">
 
-                    <div class="filter-container">
+                    <div class="filter-container" id="zone-filters">
 
                         <div class="custom-select-wrapper">
 
@@ -123,6 +109,21 @@
 
                     </div>
 
+                    <div class="filter-container hidden" id="daily-filters">
+
+                        <div class="custom-select-wrapper" style="display:flex; align-items:flex-end; gap: 10px; max-width: 400px; margin: 0 auto; width: 100%;">
+
+                            <div style="flex:1;">
+                                <label for="dailyDateSelect">Fecha de los Partidos</label>
+                                <input type="date" id="dailyDateSelect" class="custom-select" style="min-width:auto;" onchange="loadDailyMatches()">
+                            </div>
+
+                            <button class="btn-hoy" onclick="setToday()">HOY</button>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
             </section>
@@ -131,20 +132,26 @@
 
                 <div class="container">
 
-                    <div class="stats-grid">
-                        
+                    <div id="view-zone-content" class="stats-grid">
+
                         <div class="stat-card">
 
-                            <h3 class="card-header-title">Partidos</h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 
-                            <div class="custom-select-wrapper" style="margin-bottom: 15px;">
-                                <select id="teamFilterSelect" class="custom-select" style="padding: 8px 12px; font-size: 0.9rem; width: 100%; min-width: auto;" onchange="filterMatchesByTeam()" disabled>
-                                    <option value="">Todos los equipos</option>
-                                </select>
+                                <h3 class="card-header-title" style="margin:0;">Partidos</h3>
+
+                                <div class="custom-select-wrapper">
+
+                                    <select id="teamFilterSelect" class="custom-select filter-mini" onchange="filterMatchesByTeam()" disabled>
+                                        <option value="">Todos los equipos</option>
+                                    </select>
+
+                                </div>
+
                             </div>
 
                             <div id="matches-container">
-                                <p style="text-align:center; color:#888;">Selecciona una zona.</p>
+                                <p style="text-align:center; color:#888; padding: 30px;">Selecciona una zona para ver los partidos.</p>
                             </div>
 
                         </div>
@@ -162,27 +169,37 @@
                                         <tr>
                                             <th>Pos</th>
                                             <th class="t-left">Equipo</th>
-                                            <th title="Jugados">PJ</th>
-                                            <th title="Ganados">PG</th>
-                                            <th title="Perdidos">PP</th>
-                                            <th title="Porcentaje de Victorias">%V</th>
-                                            <th title="Puntos a Favor">PF</th>
-                                            <th title="Puntos en Contra">PC</th>
-                                            <th title="Diferencia de Gol">DG</th>
+                                            <th class="col-pg" title="Ganados">PG</th>
+                                            <th class="col-pp" title="Perdidos">PP</th>
+                                            <th class="col-pf" title="Puntos a Favor">PF</th>
+                                            <th class="col-pc" title="Puntos en Contra">PC</th>
+                                            <th class="col-pct" title="Porcentaje de Victorias">%</th>
+                                            <th class="col-pj" title="Jugados">PJ</th>
+                                            <th class="col-dg" title="Diferencia de Gol">DG</th>
                                         </tr>
 
                                     </thead>
 
                                     <tbody id="standings-body">
+
                                         <tr>
-                                            <td colspan="9" style="color:#888;">Esperando selección...</td>
+                                            <td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td>
                                         </tr>
+
                                     </tbody>
 
                                 </table>
 
                             </div>
 
+                        </div>
+
+                    </div>
+
+                    <div id="view-daily-content" class="hidden">
+
+                        <div id="daily-matches-container">
+                            <p style="text-align:center; color:#888; padding: 30px;">Selecciona una fecha.</p>
                         </div>
 
                     </div>
@@ -210,11 +227,15 @@
                     <p class="footer-text">Seguinos en nuestras redes!</p>
 
                     <ul class="social-list">
+
                         <li>
+
                             <a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank">
                                 <i class="ri-links-line"></i>
                             </a>
+
                         </li>
+
                     </ul>
 
                 </div>
@@ -262,7 +283,7 @@
                 <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
                 <div id="ps-match-score" class="ps-score">0 - 0</div>
             </div>
-            
+
             <div id="ps-stats-grid" class="stats-grid-cols">
 
                 <div class="stats-col">
@@ -282,12 +303,6 @@
                 </div>
 
             </div>
-            
-            <div id="cabb-btn-container" style="text-align:center; margin-top:15px; display:none;"></div>
-
-            <div class="bp-badge">
-                <i class="ri-tv-2-line"></i> Transmisión por BasquetPass.tv
-            </div>
 
         </div>
 
@@ -303,7 +318,7 @@
                 <h2 style="margin-bottom: 5px;"><i class="ri-scales-3-line"></i> Comparativa de Equipos</h2>
                 <div class="ps-score" style="font-size: 1.1rem; color: var(--cool-gray);">Promedios de Temporada</div>
             </div>
-            
+
             <div class="stats-toggle-container">
                 <button class="stats-toggle-btn active" id="btn-afavor" onclick="toggleCompStats('afavor')">A Favor</button>
                 <button class="stats-toggle-btn" id="btn-encontra" onclick="toggleCompStats('encontra')">En Contra</button>
@@ -323,10 +338,6 @@
                     <div id="comp-away-stats-encontra" class="stat-list-public hidden"></div>
                 </div>
 
-            </div>
-            
-            <div class="bp-badge">
-                <i class="ri-tv-2-line"></i> Transmisión por BasquetPass.tv
             </div>
 
         </div>
