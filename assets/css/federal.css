@@ -32,40 +32,6 @@
     border-bottom: 1px solid var(--border-color); 
 }
 
-.view-toggle-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 25px;
-    background: #e2e8f0;
-    padding: 6px;
-    border-radius: 12px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.view-toggle-btn {
-    background: transparent;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: #475569;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-}
-
-.view-toggle-btn.active {
-    background: var(--white);
-    color: var(--accent-color);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
 .filter-container { 
     display: flex;
     gap: 20px;
@@ -110,20 +76,6 @@
 
 .filter-mini { padding: 8px 12px; min-width: 180px; font-size: 0.9rem; }
 
-.btn-hoy {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    height: 46px;
-    padding: 0 20px;
-    border-radius: 10px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: 0.2s;
-    box-shadow: 0 4px 10px rgba(0, 80, 184, 0.2);
-}
-.btn-hoy:hover { background: var(--accent-hover); transform: translateY(-2px); }
-
 /* =========================================
    GRILLA PRINCIPAL Y TARJETAS
 ========================================= */
@@ -141,7 +93,6 @@
     box-shadow: var(--shadow-soft); 
     padding: 25px; 
     border: 1px solid var(--border-color); 
-    /* Eliminamos overflow-x: hidden para permitir que el box crezca junto con la tabla */
     overflow: visible;
 }
 
@@ -157,7 +108,7 @@
 }
 
 /* =========================================
-   DISEÑO DE PARTIDOS (BIG SCORE CARD)
+   DISEÑO DE PARTIDOS (BIG SCORE CARD PREMIUM)
 ========================================= */
 .round-wrapper { 
     margin-bottom: 20px; 
@@ -301,7 +252,7 @@
 
 
 /* =========================================
-   TABLA DE POSICIONES (ADAPTABLE - SIN SCROLL)
+   TABLA DE POSICIONES 
 ========================================= */
 .table-responsive { width: 100%; overflow: visible; } 
 table { width: 100%; border-collapse: collapse; font-size: 0.95rem; table-layout: auto; }
@@ -312,12 +263,14 @@ td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--borde
 
 .cell-pos-box { width: 28px; height: 28px; background: #f1f5f9; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: 800; border-radius: 6px; margin: 0 auto; color: var(--black); font-size: 0.9rem;}
 
-.t-left { text-align: left; width: 100%; } 
-.team-cell { display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
+/* ALINEACIÓN BASE PARA MOBILE: CENTRADO TOTAL */
+.t-left { text-align: center; width: 100%; } 
+.team-cell { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 auto; width: fit-content; }
 
-.t-logo { display: none; } 
-.t-name-full { display: none; } 
-.t-name-code { display: block; font-weight: 800; font-size: 1rem; color: var(--black); letter-spacing: 1px; }
+/* En mobile: Logo miniatura + Sigla. Nombre completo oculto */
+.t-logo { display: block; width: 16px; height: 16px; object-fit: contain; } 
+.t-name-full { display: none !important; } 
+.t-name-code { display: block !important; font-weight: 800; font-size: 0.95rem; color: var(--black); letter-spacing: 0.5px; text-align: center; }
 
 td.col-pj { color: var(--cool-gray); font-weight: 700; }
 td.col-pg { color: var(--green); font-weight: 900; }
@@ -331,8 +284,8 @@ td.col-pct { color: var(--accent-color); font-weight: 900; font-size: 1.05rem; }
 /* =========================================
    BOTONES EXTRAS Y MODALES
 ========================================= */
-.team-link { text-decoration: none !important; cursor: pointer; transition: transform 0.2s ease; }
-.team-link:hover { transform: translateX(3px); }
+.team-link { text-decoration: none !important; cursor: pointer; transition: transform 0.2s ease; pointer-events: none;} /* Removido el click real */
+.team-link:hover { transform: none; }
 
 /* MODALES */
 #public-stats-modal, #comparison-modal {
@@ -377,25 +330,25 @@ td.col-pct { color: var(--accent-color); font-weight: 900; font-size: 1.05rem; }
    MEDIA QUERIES (RESPONSIVE)
 ========================================= */
 @media (max-width: 991px) {
-    .col-pj, .col-dg, th.col-pj, th.col-dg { display: none !important; }
     th, td { padding: 10px 4px; font-size: 0.85rem; }
 }
 
 @media (min-width: 992px) {
-    /* minmax en la segunda columna le permite crecer al box al tamaño exacto de la tabla y no cortarla */
     .stats-grid { grid-template-columns: 420px minmax(auto, 1fr); gap: 40px; }
     
-    .team-cell { display: flex; align-items: center; justify-content: flex-start; gap: 12px; }
-    .t-logo { display: block; width: 35px; height: 35px; }
-    .t-name-full { display: block; font-size: 0.95rem; color: var(--black); white-space: nowrap; }
-    .t-name-code { display: none; }   
-    
-    #view-daily-content { max-width: 800px; margin: 0 auto; }
+    /* EN DESKTOP: Alineado a la izquierda, escudo grande y nombre completo */
+    .t-left { text-align: left; }
+    .team-cell { justify-content: flex-start; gap: 12px; margin: 0; width: auto; }
+    .t-logo { width: 35px; height: 35px; }
+    .t-name-full { display: block !important; font-size: 0.95rem; color: var(--black); white-space: nowrap; }
+    .t-name-code { display: none !important; }   
 }
 
 @media (max-width: 600px) { 
     .stats-grid-cols { grid-template-columns: 1fr; gap: 20px; } 
-    .match-meta-top { flex-direction: column; align-items: center; gap: 5px; }
+    
+    /* Forzamos a que en celulares Fecha y Hora siempre estén en la misma línea */
+    .match-meta-top { flex-direction: row; justify-content: center; gap: 10px; flex-wrap: nowrap; white-space: nowrap; }
 }
 
 /* =========================================
@@ -412,10 +365,7 @@ body.dark-mode {
 }
 
 body.dark-mode .filters-section { background: #0f172a; }
-body.dark-mode .view-toggle-container { background: #0f172a; border: 1px solid var(--border-color); }
-body.dark-mode .view-toggle-btn.active { background: #1e293b; color: #38bdf8; }
 body.dark-mode .custom-select { background: #0f172a; color: #f8fafc; }
-body.dark-mode .btn-hoy { background: #38bdf8; color: #0f172a; }
 
 body.dark-mode .stat-card { background: #1e293b; }
 body.dark-mode .round-header { color: #f8fafc; border-bottom-color: #334155; }
@@ -434,6 +384,7 @@ body.dark-mode thead { border-bottom-color: #334155; }
 body.dark-mode th { color: #94a3b8; background: transparent;}
 body.dark-mode td { border-color: #334155; }
 body.dark-mode .cell-pos-box { background: #0f172a; border-color: #334155; color: #f8fafc; }
+body.dark-mode .t-name-full, body.dark-mode .t-name-code { color: #f8fafc; }
 
 body.dark-mode .public-modal { background: #1e293b; border-color: #334155; }
 body.dark-mode .close-modal-btn { background: #0f172a; }
