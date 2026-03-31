@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre Liga Metro - Basquet Al Día</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/federal.css">
+
+    <!-- FAVICON -->
+    <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
+
+    <!-- ICONS -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+
+</head>
+<body>
+
+    <header class="header" id="header" data-header>
+
+        <div class="container">
+
+            <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
+
+            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn>
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <nav class="navbar">
+
+                <ul class="navbar-list">
+                    <!-- <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li> -->
+                    <!-- <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li> -->
+                    <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
+                    <li><a href="premetro.html" class="navbar-link">Pre Liga Metropolitana</a></li>
+                    <!-- <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li> -->
+                </ul>
+
+                <div class="header-actions">
+                    <a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a>
+                </div>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <article>
+
+            <section class="hero" id="hero">
+
+                <div class="container">
+
+                    <div class="hero-content">
+
+                        <h1 class="h1 hero-title">Pre Liga Metro</h1>
+
+                        <p class="form-text" style="align-content: center;">
+                            <span><i class="ri-error-warning-line"></i></span>
+                            TORNEO PRE LIGA METROPOLITANA. CONSULTA TABLA Y RESULTADOS AQUÍ.
+                        </p>
+
+                    </div>
+
+                    <figure class="hero-banner"><img src="assets/image/ligametro.png"></figure>
+
+                </div>
+
+            </section>
+
+            <section class="filters-section">
+
+                <div class="container">
+
+                    <div class="filter-container" id="zone-filters">
+
+                        <div class="custom-select-wrapper">
+
+                            <label for="zoneSelect">Seleccionar ZONA</label>
+
+                            <select id="zoneSelect" class="custom-select" onchange="loadData()">
+                                <option value="">Seleccionar...</option>
+                                <option value="Norte">Norte</option>
+                                <option value="Sur 1">Sur 1</option>
+                                <option value="Sur 2">Sur 2</option>
+                                <option value="Oeste">Oeste</option>
+                                <option value="Centro 1">Centro 1</option>
+                                <option value="Centro 2 / Oeste 2">Centro 2 / Oeste 2</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                
+            </section>
+
+            <section class="about" id="stats-section">
+
+                <div class="container">
+
+                    <div id="view-zone-content" class="stats-grid">
+                        
+                        <div class="stat-card">
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+
+                                <h3 class="card-header-title" style="margin:0;">Partidos</h3>
+
+                                <div class="custom-select-wrapper">
+                                    <select id="teamFilterSelect" class="custom-select filter-mini" onchange="filterMatchesByTeam()" disabled>
+                                        <option value="">Todos los equipos</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div id="matches-container">
+                                <p style="text-align:center; color:#888; padding: 30px;">Selecciona una zona para ver los partidos.</p>
+                            </div>
+
+                        </div>
+
+                        <div class="stat-card">
+
+                            <h3 class="card-header-title">Posiciones</h3>
+
+                            <div class="table-responsive">
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>Pos</th>
+                                            <th class="t-left">Equipo</th>
+                                            <th class="col-pj" title="Partidos Jugados">PJ</th>
+                                            <th class="col-pg" title="Ganados">PG</th>
+                                            <th class="col-pp" title="Perdidos">PP</th>
+                                            <th class="col-pf" title="Goles a Favor">GF</th>
+                                            <th class="col-pc" title="Goles en Contra">GC</th>
+                                            <th class="col-dg" title="Diferencia de Gol">DG</th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="standings-body">
+
+                                        <tr>
+                                            <td colspan="8" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                            
+                            <div class="standings-legend" style="margin-top: 25px; padding: 15px; background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color); font-size: 0.85rem; font-weight: 700; color: var(--cool-gray);">
+                                
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <div style="width: 14px; height: 14px; background: #0e3efc; border-radius: 4px; flex-shrink: 0;"></div>
+                                    <span>1° al 3° Puesto y dos mejores 4° generales (Clasifican a la Liga Metropolitana)</span>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <div style="width: 14px; height: 14px; background: #d4af37; border-radius: 4px; flex-shrink: 0;"></div>
+                                    <span>Resto de los 4° y del 5° al 9° Puesto (Juegan la Copa de Oro)</span>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 14px; height: 14px; background: #a8b3bd; border-radius: 4px; flex-shrink: 0;"></div>
+                                    <span>10° Puesto en adelante (Juegan la Copa de Plata)</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer>
+
+        <div class="footer-top">
+
+            <div class="container">
+
+                <div class="footer-brand">
+
+                    <a href="#" class="logo">
+                        <img src="assets/image/favicon.png" width="100px">
+                    </a>
+
+                    <p class="footer-text">Seguinos en nuestras redes!</p>
+
+                    <ul class="social-list">
+
+                        <li>
+                            <a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank">
+                                <i class="ri-links-line"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-link-box">
+
+                    <ul class="footer-list">
+                        <li><p class="footer-item-title">Competencias</p></li>
+                        <!-- <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li> -->
+                        <!-- <li><a href="ligaargentina.html" class="footer-link">Liga Argentina</a></li> -->
+                        <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
+                        <li><a href="premetro.html" class="footer-link">Pre Liga Metropolitana</a></li>
+                        <!-- <li><a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a></li> -->
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="footer-botton">
+
+            <div class="container">
+
+                <center>
+                    <p class="copyright">
+                        Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.
+                    </p>
+                </center>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script type="module" src="assets/js/premetro.js"></script>
+    <script src="assets/js/principal.js"></script>
+    <script src="assets/js/darkmode.js"></script>
+    
+</body>
+</html>
