@@ -27,111 +27,145 @@ const structure = {
 
 let localDB = { teams: [], matches: [] }
 
-async function initApp() {
-    try {
-        const docRef = doc(dbFire, "liga_federal", "data_v1");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            localDB = docSnap.data();
-            console.log("Datos actualizados desde la base de datos.");
+async function initApp() 
+{
+    try 
+    {
+        const docRef = doc(dbFire, "liga_federal", "data_v1")
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) 
+        {
+            localDB = docSnap.data()
+            console.log("Datos actualizados desde la base de datos.")
         } 
-    } catch (error) { console.error("Error conectando a la base de datos:", error); }
-}
-initApp();
 
-window.toggleMainView = (view) => {
-    const btnZone = document.getElementById('btn-view-zone');
-    const btnDaily = document.getElementById('btn-view-daily');
-    const zoneFilters = document.getElementById('zone-filters');
-    const dailyFilters = document.getElementById('daily-filters');
-    const zoneContent = document.getElementById('view-zone-content');
-    const dailyContent = document.getElementById('view-daily-content');
-
-    if (view === 'zone') {
-        btnZone.classList.add('active');
-        btnDaily.classList.remove('active');
-        zoneFilters.classList.remove('hidden');
-        dailyFilters.classList.add('hidden');
-        zoneContent.classList.remove('hidden');
-        dailyContent.classList.add('hidden');
-    } else {
-        btnDaily.classList.add('active');
-        btnZone.classList.remove('active');
-        dailyFilters.classList.remove('hidden');
-        zoneFilters.classList.add('hidden');
-        dailyContent.classList.remove('hidden');
-        zoneContent.classList.add('hidden');
-        
-        if(!document.getElementById('dailyDateSelect').value) {
-            window.setToday();
-        } else {
-            window.loadDailyMatches();
-        }
+    } 
+    catch (error) 
+    { 
+        console.error("Error conectando a la base de datos:", error)
     }
 }
 
-window.setToday = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    document.getElementById('dailyDateSelect').value = `${yyyy}-${mm}-${dd}`;
-    window.loadDailyMatches();
+initApp()
+
+window.toggleMainView = (view) => 
+{
+
+    const btnZone = document.getElementById('btn-view-zone')
+    const btnDaily = document.getElementById('btn-view-daily')
+    const zoneFilters = document.getElementById('zone-filters')
+    const dailyFilters = document.getElementById('daily-filters')
+    const zoneContent = document.getElementById('view-zone-content')
+    const dailyContent = document.getElementById('view-daily-content')
+
+    if (view === 'zone') 
+    {
+        btnZone.classList.add('active')
+        btnDaily.classList.remove('active')
+        zoneFilters.classList.remove('hidden')
+        dailyFilters.classList.add('hidden')
+        zoneContent.classList.remove('hidden')
+        dailyContent.classList.add('hidden')
+    } 
+
+    else 
+    {
+        btnDaily.classList.add('active')
+        btnZone.classList.remove('active')
+        dailyFilters.classList.remove('hidden')
+        zoneFilters.classList.add('hidden')
+        dailyContent.classList.remove('hidden')
+        zoneContent.classList.add('hidden')
+        
+        if(!document.getElementById('dailyDateSelect').value) 
+        {
+            window.setToday()
+        } 
+        else 
+        {
+            window.loadDailyMatches()
+        }
+
+    }
+
+}
+
+window.setToday = () => 
+{
+    const today = new Date()
+    const yyyy = today.getFullYear()
+    const mm = String(today.getMonth() + 1).padStart(2, '0')
+    const dd = String(today.getDate()).padStart(2, '0')
+    document.getElementById('dailyDateSelect').value = `${yyyy}-${mm}-${dd}`
+    window.loadDailyMatches()
 }
 
 window.loadDailyMatches = () => {
-    const dateVal = document.getElementById('dailyDateSelect').value;
-    const container = document.getElementById('daily-matches-container');
-    if(!dateVal) return;
 
-    const matches = localDB.matches.filter(m => m.date === dateVal);
+    const dateVal = document.getElementById('dailyDateSelect').value
+    const container = document.getElementById('daily-matches-container')
+    if(!dateVal) return
+
+    const matches = localDB.matches.filter(m => m.date === dateVal)
     
-    if(matches.length === 0) {
-        container.innerHTML = '<div class="stat-card"><p style="text-align:center; color:#888; font-weight:600; padding:30px;">No hay partidos programados para esta fecha.</p></div>';
-        return;
+    if(matches.length === 0) 
+    {
+        container.innerHTML = '<div class="stat-card"><p style="text-align:center; color:#888; font-weight:600; padding:30px;">No hay partidos programados para esta fecha.</p></div>'
+        return
     }
 
-    const grouped = {};
-    matches.forEach(m => {
-        if(!grouped[m.zone]) grouped[m.zone] = [];
-        grouped[m.zone].push(m);
-    });
+    const grouped = {}
 
-    let html = '';
-    Object.keys(grouped).sort().forEach(zone => {
+    matches.forEach(m => 
+    {
+        if(!grouped[m.zone]) grouped[m.zone] = []
+        grouped[m.zone].push(m)
+    })
+
+    let html = ''
+
+    Object.keys(grouped).sort().forEach(zone => 
+    {
+
         html += `<div class="stat-card" style="margin-bottom: 25px;">
-                    <h3 class="card-header-title">📍 Zona ${zone}</h3>
-                    <div style="display:flex; flex-direction:column; gap:10px;">`;
+                <h3 class="card-header-title">📍 Zona ${zone}</h3>
+                <div style="display:flex; flex-direction:column; gap:10px;">`
         
-        grouped[zone].forEach(m => {
-            const homeTeam = localDB.teams.find(t => t.name === m.home);
-            const awayTeam = localDB.teams.find(t => t.name === m.away);
-            const hLogo = homeTeam ? homeTeam.logo : defaultLogo;
-            const aLogo = awayTeam ? awayTeam.logo : defaultLogo;
-            const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase();
-            const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase();
+        grouped[zone].forEach(m => 
+        {
+
+            const homeTeam = localDB.teams.find(t => t.name === m.home)
+            const awayTeam = localDB.teams.find(t => t.name === m.away)
+            const hLogo = homeTeam ? homeTeam.logo : defaultLogo
+            const aLogo = awayTeam ? awayTeam.logo : defaultLogo
+            const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase()
+            const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
             
-            const dateInfo = formatDateInfo(m.date);
+            const dateInfo = formatDateInfo(m.date)
 
-            let actionButtons = '';
-            let rowClick = '';
-            let rowClass = 'team-premium-row';
+            let actionButtons = ''
+            let rowClick = ''
+            let rowClass = 'team-premium-row'
 
-            if (m.homePts !== '-' && m.awayPts !== '-') {
-                actionButtons = `<button class="btn-action-wide" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`;
-                rowClick = `onclick="openComparisonModal('${m.id}')"`;
-                rowClass += ` clickable`;
-            } else {
-                actionButtons = `<button class="btn-action-wide" onclick="openComparisonModal('${m.id}')"><i class="ri-scales-3-line"></i> Comparar</button>`;
-                rowClick = ``;
+            if (m.homePts !== '-' && m.awayPts !== '-') 
+            {
+                actionButtons = `<button class="btn-action-wide" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`
+                rowClick = `onclick="openComparisonModal('${m.id}')"`
+                rowClass += ` clickable`
+            } 
+
+            else 
+            {
+                actionButtons = `<button class="btn-action-wide" onclick="openComparisonModal('${m.id}')"><i class="ri-scales-3-line"></i> Comparar</button>`
+                rowClick = ``
             }
 
-            const hPts = parseInt(m.homePts);
-            const aPts = parseInt(m.awayPts);
-            const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : '';
-            const aWin = !isNaN(hPts) && !isNaN(aPts) && aPts > hPts ? 'winner' : '';
-            
-            const stadiumName = m.stadium && m.stadium.trim() !== '' ? m.stadium : 'Estadio a definir';
+            const hPts = parseInt(m.homePts)
+            const aPts = parseInt(m.awayPts)
+            const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : ''
+            const aWin = !isNaN(hPts) && !isNaN(aPts) && aPts > hPts ? 'winner' : ''
+            const stadiumName = m.stadium && m.stadium.trim() !== '' ? m.stadium : 'Estadio a definir'
 
             html += `
             <div class="match-card-premium">
@@ -165,15 +199,21 @@ window.loadDailyMatches = () => {
                 <div class="match-premium-actions">
                     ${actionButtons}
                 </div>
-            </div>`;
-        });
-        html += `</div></div>`;
-    });
+            </div>`
+
+        })
+
+        html += `</div></div>`
+
+    })
     
-    container.innerHTML = html;
+    container.innerHTML = html
+
 }
 
-window.updateZoneOptions = () => {
+window.updateZoneOptions = () => 
+{
+
     const confSelect = document.getElementById('conferenceSelect')
     const zoneSelect = document.getElementById('zoneSelect')
     const teamFilter = document.getElementById('teamFilterSelect')
@@ -182,14 +222,19 @@ window.updateZoneOptions = () => {
     zoneSelect.innerHTML = '<option value="">Seleccionar Zona...</option>'
     zoneSelect.disabled = true
     
-    if(teamFilter) {
-        teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
-        teamFilter.disabled = true;
+    if(teamFilter) 
+    {
+        teamFilter.innerHTML = '<option value="">Todos los equipos</option>'
+        teamFilter.disabled = true
     }
     
-    if (selectedConf && structure[selectedConf]) {
+    if (selectedConf && structure[selectedConf]) 
+    {
+
         zoneSelect.disabled = false
-        structure[selectedConf].forEach(z => {
+
+        structure[selectedConf].forEach(z => 
+        {
             const option = document.createElement('option')
             option.value = z
             option.textContent = z === "Unica" ? "Zona Única" : "Zona " + z
@@ -199,9 +244,12 @@ window.updateZoneOptions = () => {
 
     document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888; padding:30px;">Selecciona una zona para ver los partidos.</p>'
     document.getElementById('standings-body').innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr>'
+
 }
 
-window.loadData = () => {
+window.loadData = () => 
+{
+
     const conf = document.getElementById('conferenceSelect').value
     const zoneCode = document.getElementById('zoneSelect').value
     if (!conf || !zoneCode) return
@@ -211,22 +259,30 @@ window.loadData = () => {
     const zoneMatches = localDB.matches.filter(m => m.zone === searchKey)
     
     const teamFilter = document.getElementById('teamFilterSelect')
-    if (teamFilter) {
+
+    if (teamFilter) 
+    {
+
         teamFilter.innerHTML = '<option value="">Todos los equipos</option>'
         teamFilter.disabled = false
+
         zoneTeams.sort((a,b) => a.name.localeCompare(b.name)).forEach(t => {
             const opt = document.createElement('option')
             opt.value = t.name
             opt.textContent = t.name
             teamFilter.appendChild(opt)
         })
+
     }
     
     renderMatches(zoneMatches, localDB.teams)
     renderStandings(zoneTeams, zoneMatches)
+
 }
 
-window.filterMatchesByTeam = () => {
+window.filterMatchesByTeam = () => 
+{
+
     const conf = document.getElementById('conferenceSelect').value
     const zoneCode = document.getElementById('zoneSelect').value
     const selectedTeam = document.getElementById('teamFilterSelect').value
@@ -234,22 +290,30 @@ window.filterMatchesByTeam = () => {
     const searchKey = `${conf} ${zoneCode}`
     
     let filteredMatches = localDB.matches.filter(m => m.zone === searchKey)
-    if (selectedTeam) {
+
+    if (selectedTeam) 
+    {
         filteredMatches = filteredMatches.filter(m => m.home === selectedTeam || m.away === selectedTeam)
     }
+
     renderMatches(filteredMatches, localDB.teams)
+
 }
 
-function renderMatches(matches, allTeams) {
+function renderMatches(matches, allTeams) 
+{
+
     const container = document.getElementById('matches-container')
     container.innerHTML = ''
     
-    if (matches.length === 0) { 
+    if (matches.length === 0) 
+    { 
         container.innerHTML = '<p style="text-align:center; color:#888; padding:30px;">No hay partidos cargados para esta selección.</p>'
         return
     }
 
     const grouped = {}
+
     matches.forEach(m => { 
         if (!grouped[m.round]) grouped[m.round] = []
         grouped[m.round].push(m)
@@ -259,40 +323,47 @@ function renderMatches(matches, allTeams) {
     let isFirst = true
 
     rounds.forEach(round => {
+
         const activeClass = isFirst ? 'active' : ''
         const showClass = isFirst ? 'show' : ''
         isFirst = false
 
         let matchesHtml = ''
+
         grouped[round].forEach(m => {
+
             const homeTeam = allTeams.find(t => t.name === m.home)
             const awayTeam = allTeams.find(t => t.name === m.away)
             const hLogo = homeTeam ? homeTeam.logo : defaultLogo
             const aLogo = awayTeam ? awayTeam.logo : defaultLogo
             const dateInfo = formatDateInfo(m.date)
 
-            let actionButtons = '';
-            let rowClick = '';
-            let rowClass = 'team-premium-row';
+            let actionButtons = ''
+            let rowClick = ''
+            let rowClass = 'team-premium-row'
 
-            if (m.homePts !== '-' && m.awayPts !== '-') {
-                actionButtons = `<button class="btn-action-wide" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`;
-                rowClick = `onclick="openComparisonModal('${m.id}')"`;
-                rowClass += ` clickable`;
-            } else {
-                actionButtons = `<button class="btn-action-wide" onclick="openComparisonModal('${m.id}')"><i class="ri-scales-3-line"></i> Comparar</button>`;
-                rowClick = ``;
+            if (m.homePts !== '-' && m.awayPts !== '-') 
+            {
+                actionButtons = `<button class="btn-action-wide" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`
+                rowClick = `onclick="openComparisonModal('${m.id}')"`
+                rowClass += ` clickable`
+            } 
+
+            else 
+            {
+                actionButtons = `<button class="btn-action-wide" onclick="openComparisonModal('${m.id}')"><i class="ri-scales-3-line"></i> Comparar</button>`
+                rowClick = ``
             }
 
             const hPts = parseInt(m.homePts) || 0
             const aPts = parseInt(m.awayPts) || 0
-            const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : '';
-            const aWin = !isNaN(hPts) && !isNaN(aPts) && aPts > hPts ? 'winner' : '';
+            const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : ''
+            const aWin = !isNaN(hPts) && !isNaN(aPts) && aPts > hPts ? 'winner' : ''
 
             const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase()
             const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
             
-            const stadiumName = m.stadium && m.stadium.trim() !== '' ? m.stadium : 'Estadio a definir';
+            const stadiumName = m.stadium && m.stadium.trim() !== '' ? m.stadium : 'Estadio a definir'
 
             matchesHtml += `
             <div class="match-card-premium">
@@ -327,6 +398,7 @@ function renderMatches(matches, allTeams) {
                     ${actionButtons}
                 </div>
             </div>`
+
         })
 
         container.innerHTML += `
@@ -337,63 +409,83 @@ function renderMatches(matches, allTeams) {
                 </div>
                 <div class="round-content ${showClass}">${matchesHtml}</div>
             </div>`
+
     })
+
 }
 
-window.toggleCompStats = (view) => {
-    if(view === 'afavor') {
-        document.getElementById('btn-afavor').classList.add('active');
-        document.getElementById('btn-encontra').classList.remove('active');
-        document.getElementById('comp-home-stats-afavor').style.display = 'block';
-        document.getElementById('comp-away-stats-afavor').style.display = 'block';
-        document.getElementById('comp-home-stats-encontra').style.display = 'none';
-        document.getElementById('comp-away-stats-encontra').style.display = 'none';
-    } else {
-        document.getElementById('btn-encontra').classList.add('active');
-        document.getElementById('btn-afavor').classList.remove('active');
-        document.getElementById('comp-home-stats-encontra').style.display = 'block';
-        document.getElementById('comp-away-stats-encontra').style.display = 'block';
-        document.getElementById('comp-home-stats-afavor').style.display = 'none';
-        document.getElementById('comp-away-stats-afavor').style.display = 'none';
+window.toggleCompStats = (view) => 
+    {
+    if(view === 'afavor') 
+    {
+        document.getElementById('btn-afavor').classList.add('active')
+        document.getElementById('btn-encontra').classList.remove('active')
+        document.getElementById('comp-home-stats-afavor').style.display = 'block'
+        document.getElementById('comp-away-stats-afavor').style.display = 'block'
+        document.getElementById('comp-home-stats-encontra').style.display = 'none'
+        document.getElementById('comp-away-stats-encontra').style.display = 'none'
+    } 
+    
+    else 
+    {
+        document.getElementById('btn-encontra').classList.add('active')
+        document.getElementById('btn-afavor').classList.remove('active')
+        document.getElementById('comp-home-stats-encontra').style.display = 'block'
+        document.getElementById('comp-away-stats-encontra').style.display = 'block'
+        document.getElementById('comp-home-stats-afavor').style.display = 'none'
+        document.getElementById('comp-away-stats-afavor').style.display = 'none'
     }
-};
 
-function getTeamSeasonStats(teamName) {
-    let gamesPlayed = 0, statsGames = 0, wins = 0, losses = 0;
-    let totals = { pts: 0, opp_pts: 0, reb: 0, oreb: 0, ast: 0, stl: 0, tov: 0, q1: 0, q2: 0, q3: 0, q4: 0, opp_q1: 0, opp_q2: 0, opp_q3: 0, opp_q4: 0 };
+}
 
-    localDB.matches.forEach(m => {
-        if (m.homePts === '-' || m.awayPts === '-') return; 
+function getTeamSeasonStats(teamName) 
+{
 
-        let isHome = m.home === teamName;
-        let isAway = m.away === teamName;
+    let gamesPlayed = 0, statsGames = 0, wins = 0, losses = 0
+    let totals = { pts: 0, opp_pts: 0, reb: 0, oreb: 0, ast: 0, stl: 0, tov: 0, q1: 0, q2: 0, q3: 0, q4: 0, opp_q1: 0, opp_q2: 0, opp_q3: 0, opp_q4: 0 }
 
-        if (isHome || isAway) {
-            gamesPlayed++;
-            let myPts = parseInt(isHome ? m.homePts : m.awayPts) || 0;
-            let oppPts = parseInt(isHome ? m.awayPts : m.homePts) || 0;
+    localDB.matches.forEach(m => 
+    {
+
+        if (m.homePts === '-' || m.awayPts === '-') return
+
+        let isHome = m.home === teamName
+        let isAway = m.away === teamName
+
+        if (isHome || isAway) 
+        {
+            gamesPlayed++
+            let myPts = parseInt(isHome ? m.homePts : m.awayPts) || 0
+            let oppPts = parseInt(isHome ? m.awayPts : m.homePts) || 0
             
-            totals.pts += myPts; totals.opp_pts += oppPts;
-            if (myPts > oppPts) wins++; else if (myPts < oppPts) losses++;
+            totals.pts += myPts; totals.opp_pts += oppPts
+            if (myPts > oppPts) wins++; else if (myPts < oppPts) losses++
 
-            let teamStats = null, oppStats = null;
-            if (m.stats) {
-                teamStats = isHome ? m.stats.home : m.stats.away;
-                oppStats = isHome ? m.stats.away : m.stats.home;
+            let teamStats = null, oppStats = null
+
+            if (m.stats) 
+            {
+                teamStats = isHome ? m.stats.home : m.stats.away
+                oppStats = isHome ? m.stats.away : m.stats.home
             }
 
-            if (teamStats && Object.keys(teamStats).length > 0) {
-                statsGames++;
-                totals.reb += parseInt(teamStats.reb) || 0; totals.oreb += parseInt(teamStats.oreb) || 0;
-                totals.ast += parseInt(teamStats.ast) || 0; totals.stl += parseInt(teamStats.stl) || 0; totals.tov += parseInt(teamStats.tov) || 0;
-                totals.q1 += parseInt(teamStats.q1) || 0; totals.q2 += parseInt(teamStats.q2) || 0; totals.q3 += parseInt(teamStats.q3) || 0; totals.q4 += parseInt(teamStats.q4) || 0;
+            if (teamStats && Object.keys(teamStats).length > 0) 
+            {
+                statsGames++
+                totals.reb += parseInt(teamStats.reb) || 0; totals.oreb += parseInt(teamStats.oreb) || 0
+                totals.ast += parseInt(teamStats.ast) || 0; totals.stl += parseInt(teamStats.stl) || 0; totals.tov += parseInt(teamStats.tov) || 0
+                totals.q1 += parseInt(teamStats.q1) || 0; totals.q2 += parseInt(teamStats.q2) || 0; totals.q3 += parseInt(teamStats.q3) || 0; totals.q4 += parseInt(teamStats.q4) || 0
             }
-            if (oppStats && Object.keys(oppStats).length > 0) {
-                totals.opp_q1 += parseInt(oppStats.q1) || 0; totals.opp_q2 += parseInt(oppStats.q2) || 0;
-                totals.opp_q3 += parseInt(oppStats.q3) || 0; totals.opp_q4 += parseInt(oppStats.q4) || 0;
+
+            if (oppStats && Object.keys(oppStats).length > 0) 
+            {
+                totals.opp_q1 += parseInt(oppStats.q1) || 0; totals.opp_q2 += parseInt(oppStats.q2) || 0
+                totals.opp_q3 += parseInt(oppStats.q3) || 0; totals.opp_q4 += parseInt(oppStats.q4) || 0
             }
+
         }
-    });
+
+    })
 
     return {
         record: `${wins}-${losses}`,
@@ -401,117 +493,161 @@ function getTeamSeasonStats(teamName) {
         q1: statsGames > 0 ? (totals.q1 / statsGames).toFixed(1) : '-', q2: statsGames > 0 ? (totals.q2 / statsGames).toFixed(1) : '-', q3: statsGames > 0 ? (totals.q3 / statsGames).toFixed(1) : '-', q4: statsGames > 0 ? (totals.q4 / statsGames).toFixed(1) : '-',
         opp_q1: statsGames > 0 ? (totals.opp_q1 / statsGames).toFixed(1) : '-', opp_q2: statsGames > 0 ? (totals.opp_q2 / statsGames).toFixed(1) : '-', opp_q3: statsGames > 0 ? (totals.opp_q3 / statsGames).toFixed(1) : '-', opp_q4: statsGames > 0 ? (totals.opp_q4 / statsGames).toFixed(1) : '-',
         reb: statsGames > 0 ? (totals.reb / statsGames).toFixed(1) : '-', oreb: statsGames > 0 ? (totals.oreb / statsGames).toFixed(1) : '-', ast: statsGames > 0 ? (totals.ast / statsGames).toFixed(1) : '-', stl: statsGames > 0 ? (totals.stl / statsGames).toFixed(1) : '-', tov: statsGames > 0 ? (totals.tov / statsGames).toFixed(1) : '-'
-    };
+    }
+
 }
 
-window.openComparisonModal = (matchId) => {
-    const m = localDB.matches.find(x => String(x.id) === String(matchId));
-    if(!m) return;
-    window.toggleCompStats('afavor');
-    const homeTeam = localDB.teams.find(t => t.name === m.home);
-    const awayTeam = localDB.teams.find(t => t.name === m.away);
-    const hLogo = homeTeam ? homeTeam.logo : defaultLogo;
-    const aLogo = awayTeam ? awayTeam.logo : defaultLogo;
+window.openComparisonModal = (matchId) => 
+{
+    
+    const m = localDB.matches.find(x => String(x.id) === String(matchId))
+    if(!m) return
+    window.toggleCompStats('afavor')
+    const homeTeam = localDB.teams.find(t => t.name === m.home)
+    const awayTeam = localDB.teams.find(t => t.name === m.away)
+    const hLogo = homeTeam ? homeTeam.logo : defaultLogo
+    const aLogo = awayTeam ? awayTeam.logo : defaultLogo
 
-    const hStats = getTeamSeasonStats(m.home);
-    const aStats = getTeamSeasonStats(m.away);
+    const hStats = getTeamSeasonStats(m.home)
+    const aStats = getTeamSeasonStats(m.away)
 
-    document.getElementById('comp-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${hStats.record}</span>`;
-    document.getElementById('comp-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${aStats.record}</span>`;
+    document.getElementById('comp-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${hStats.record}</span>`
+    document.getElementById('comp-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${aStats.record}</span>`
 
-    const buildCompRow = (label, hVal, aVal, inverse = false) => {
-        const hNum = parseFloat(hVal); const aNum = parseFloat(aVal);
-        let hWin = false; let aWin = false;
-        if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) {
-            if (inverse) { hWin = hNum < aNum; aWin = aNum < hNum; } else { hWin = hNum > aNum; aWin = aNum > hNum; }
+    const buildCompRow = (label, hVal, aVal, inverse = false) => 
+    {
+
+        const hNum = parseFloat(hVal); const aNum = parseFloat(aVal)
+        let hWin = false; let aWin = false
+
+        if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) 
+        {
+
+            if (inverse) 
+            { 
+                hWin = hNum < aNum
+                aWin = aNum < hNum
+            } 
+
+            else 
+            { 
+                hWin = hNum > aNum
+                aWin = aNum > hNum
+            }
+
         }
-        const hRow = `<div class="modal-stat-row"><span class="modal-stat-label">${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal}</span></div>`;
-        const aRow = `<div class="modal-stat-row"><span class="modal-stat-label">${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal}</span></div>`;
-        return { hRow, aRow };
-    };
 
-    let hAFavor = '<h4 class="stat-section-title"><i class="ri-timer-line"></i> A Favor x Cuarto</h4>';
-    let aAFavor = '<h4 class="stat-section-title"><i class="ri-timer-line"></i> A Favor x Cuarto</h4>';
-    const qKeys = ['q1', 'q2', 'q3', 'q4']; const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
-    qKeys.forEach((k, i) => { const res = buildCompRow(qLabels[i], hStats[k], aStats[k]); hAFavor += res.hRow; aAFavor += res.aRow; });
+        const hRow = `<div class="modal-stat-row"><span class="modal-stat-label">${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal}</span></div>`
+        const aRow = `<div class="modal-stat-row"><span class="modal-stat-label">${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal}</span></div>`
+        return { hRow, aRow }
 
-    hAFavor += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-bar-chart-box-line"></i> Generales (Positivas)</h4>';
-    aAFavor += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-bar-chart-box-line"></i> Generales (Positivas)</h4>';
-    const posKeys = ['pts', 'reb', 'oreb', 'ast', 'stl']; const posLabels = ['Puntos a Favor', 'Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos'];
-    posKeys.forEach((k, i) => { const res = buildCompRow(posLabels[i], hStats[k], aStats[k]); hAFavor += res.hRow; aAFavor += res.aRow; });
+    }
 
-    let hEnContra = '<h4 class="stat-section-title"><i class="ri-shield-line"></i> En Contra x Cuarto</h4>';
-    let aEnContra = '<h4 class="stat-section-title"><i class="ri-shield-line"></i> En Contra x Cuarto</h4>';
+    let hAFavor = '<h4 class="stat-section-title"><i class="ri-timer-line"></i> A Favor x Cuarto</h4>'
+    let aAFavor = '<h4 class="stat-section-title"><i class="ri-timer-line"></i> A Favor x Cuarto</h4>'
+    const qKeys = ['q1', 'q2', 'q3', 'q4']; const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto']
+    qKeys.forEach((k, i) => { const res = buildCompRow(qLabels[i], hStats[k], aStats[k]); hAFavor += res.hRow; aAFavor += res.aRow; })
+
+    hAFavor += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-bar-chart-box-line"></i> Generales (Positivas)</h4>'
+    aAFavor += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-bar-chart-box-line"></i> Generales (Positivas)</h4>'
+    const posKeys = ['pts', 'reb', 'oreb', 'ast', 'stl']; const posLabels = ['Puntos a Favor', 'Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos']
+    posKeys.forEach((k, i) => { const res = buildCompRow(posLabels[i], hStats[k], aStats[k]); hAFavor += res.hRow; aAFavor += res.aRow; })
+
+    let hEnContra = '<h4 class="stat-section-title"><i class="ri-shield-line"></i> En Contra x Cuarto</h4>'
+    let aEnContra = '<h4 class="stat-section-title"><i class="ri-shield-line"></i> En Contra x Cuarto</h4>'
     const oppQKeys = ['opp_q1', 'opp_q2', 'opp_q3', 'opp_q4'];
-    oppQKeys.forEach((k, i) => { const res = buildCompRow(qLabels[i], hStats[k], aStats[k], true); hEnContra += res.hRow; aEnContra += res.aRow; });
+    oppQKeys.forEach((k, i) => { const res = buildCompRow(qLabels[i], hStats[k], aStats[k], true); hEnContra += res.hRow; aEnContra += res.aRow; })
 
-    hEnContra += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-error-warning-line"></i> Generales (Negativas)</h4>';
-    aEnContra += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-error-warning-line"></i> Generales (Negativas)</h4>';
-    const negKeys = ['opp_pts', 'tov']; const negLabels = ['Puntos en Contra', 'Pérdidas'];
-    negKeys.forEach((k, i) => { const res = buildCompRow(negLabels[i], hStats[k], aStats[k], true); hEnContra += res.hRow; aEnContra += res.aRow; });
+    hEnContra += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-error-warning-line"></i> Generales (Negativas)</h4>'
+    aEnContra += '<h4 class="stat-section-title" style="margin-top:20px;"><i class="ri-error-warning-line"></i> Generales (Negativas)</h4>'
+    const negKeys = ['opp_pts', 'tov']; const negLabels = ['Puntos en Contra', 'Pérdidas']
+    negKeys.forEach((k, i) => { const res = buildCompRow(negLabels[i], hStats[k], aStats[k], true); hEnContra += res.hRow; aEnContra += res.aRow; })
 
-    document.getElementById('comp-home-stats-afavor').innerHTML = hAFavor; document.getElementById('comp-away-stats-afavor').innerHTML = aAFavor;
-    document.getElementById('comp-home-stats-encontra').innerHTML = hEnContra; document.getElementById('comp-away-stats-encontra').innerHTML = aEnContra;
-    document.getElementById('comparison-modal').classList.remove('hidden');
+    document.getElementById('comp-home-stats-afavor').innerHTML = hAFavor; document.getElementById('comp-away-stats-afavor').innerHTML = aAFavor
+    document.getElementById('comp-home-stats-encontra').innerHTML = hEnContra; document.getElementById('comp-away-stats-encontra').innerHTML = aEnContra
+    document.getElementById('comparison-modal').classList.remove('hidden')
 };
 
-window.closeComparisonModal = () => { document.getElementById('comparison-modal').classList.add('hidden'); };
+window.closeComparisonModal = () => { document.getElementById('comparison-modal').classList.add('hidden')}
 
 window.openPublicStatsModal = (matchId) => {
-    const m = localDB.matches.find(x => String(x.id) === String(matchId));
-    if(!m) return;
-    
-    const homeTeam = localDB.teams.find(t => t.name === m.home);
-    const awayTeam = localDB.teams.find(t => t.name === m.away);
-    const hLogo = homeTeam ? homeTeam.logo : defaultLogo;
-    const aLogo = awayTeam ? awayTeam.logo : defaultLogo;
 
-    document.getElementById('ps-match-title').innerText = `${m.home} vs ${m.away}`;
-    document.getElementById('ps-match-score').innerText = `${m.homePts} - ${m.awayPts}`;
+    const m = localDB.matches.find(x => String(x.id) === String(matchId))
+    if(!m) return
     
-    document.getElementById('ps-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}`;
-    document.getElementById('ps-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}`;
+    const homeTeam = localDB.teams.find(t => t.name === m.home)
+    const awayTeam = localDB.teams.find(t => t.name === m.away)
+    const hLogo = homeTeam ? homeTeam.logo : defaultLogo
+    const aLogo = awayTeam ? awayTeam.logo : defaultLogo
+
+    document.getElementById('ps-match-title').innerText = `${m.home} vs ${m.away}`
+    document.getElementById('ps-match-score').innerText = `${m.homePts} - ${m.awayPts}`
     
-    document.getElementById('ps-stats-grid').classList.remove('hidden');
+    document.getElementById('ps-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}`
+    document.getElementById('ps-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}`
     
-    const sHome = (m.stats && m.stats.home) ? m.stats.home : {};
-    const sAway = (m.stats && m.stats.away) ? m.stats.away : {};
+    document.getElementById('ps-stats-grid').classList.remove('hidden')
     
-    let hQuarters = '', aQuarters = '';
-    const qKeys = ['q1', 'q2', 'q3', 'q4']; const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto'];
+    const sHome = (m.stats && m.stats.home) ? m.stats.home : {}
+    const sAway = (m.stats && m.stats.away) ? m.stats.away : {}
+    
+    let hQuarters = '', aQuarters = ''
+    const qKeys = ['q1', 'q2', 'q3', 'q4']; const qLabels = ['1° Cuarto', '2° Cuarto', '3° Cuarto', '4° Cuarto']
+
     const buildStatRow = (label, hVal, aVal, inverse = false, labelColor = '') => {
-        const hNum = parseInt(hVal); const aNum = parseInt(aVal);
-        let hWin = false; let aWin = false;
-        if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) {
-            if (inverse) { hWin = hNum < aNum; aWin = aNum < hNum; } else { hWin = hNum > aNum; aWin = aNum > hNum; }
-        }
-        const lblStyle = labelColor ? `style="color:${labelColor};"` : '';
-        const hRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal || '-'}</span></div>`;
-        const aRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal || '-'}</span></div>`;
-        return { hRow, aRow };
-    };
 
-    qKeys.forEach((k, i) => { const res = buildStatRow(qLabels[i], sHome[k], sAway[k]); hQuarters += res.hRow; aQuarters += res.aRow; });
-    let otIndex = 1;
+        const hNum = parseInt(hVal); const aNum = parseInt(aVal)
+        let hWin = false; let aWin = false
+
+        if (!isNaN(hNum) && !isNaN(aNum) && hNum !== aNum) 
+        {
+
+            if (inverse) 
+            {
+                hWin = hNum < aNum
+                aWin = aNum < hNum
+            } 
+            
+            else 
+            { 
+                hWin = hNum > aNum
+                aWin = aNum > hNum
+            }
+
+        }
+
+        const lblStyle = labelColor ? `style="color:${labelColor};"` : ''
+        const hRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${hWin ? 'winner-stat' : ''}">${hVal || '-'}</span></div>`
+        const aRow = `<div class="modal-stat-row"><span class="modal-stat-label" ${lblStyle}>${label}</span><span class="modal-stat-value ${aWin ? 'winner-stat' : ''}">${aVal || '-'}</span></div>`
+        return { hRow, aRow }
+
+    }
+
+    qKeys.forEach((k, i) => { const res = buildStatRow(qLabels[i], sHome[k], sAway[k]); hQuarters += res.hRow; aQuarters += res.aRow; })
+    let otIndex = 1
+
     while(sHome[`ot${otIndex}`] !== undefined || sAway[`ot${otIndex}`] !== undefined) {
-        const res = buildStatRow(`Suple ${otIndex}`, sHome[`ot${otIndex}`], sAway[`ot${otIndex}`], false, '#f39c12');
-        hQuarters += res.hRow; aQuarters += res.aRow; otIndex++;
+        const res = buildStatRow(`Suple ${otIndex}`, sHome[`ot${otIndex}`], sAway[`ot${otIndex}`], false, '#f39c12')
+        hQuarters += res.hRow; aQuarters += res.aRow; otIndex++
     }
     
-    document.getElementById('ps-home-quarters').innerHTML = hQuarters; document.getElementById('ps-away-quarters').innerHTML = aQuarters;
+    document.getElementById('ps-home-quarters').innerHTML = hQuarters
+    document.getElementById('ps-away-quarters').innerHTML = aQuarters
     
-    const advKeys = ['reb', 'oreb', 'ast', 'stl', 'tov']; const advLabels = ['Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos', 'Pérdidas'];
-    let hAdv = '', aAdv = '';
-    advKeys.forEach((k, i) => {
-        const isInverse = (k === 'tov'); const res = buildStatRow(advLabels[i], sHome[k], sAway[k], isInverse);
-        hAdv += res.hRow; aAdv += res.aRow;
-    });
-    
-    document.getElementById('ps-home-advanced').innerHTML = hAdv; document.getElementById('ps-away-advanced').innerHTML = aAdv;
-    document.getElementById('public-stats-modal').classList.remove('hidden');
-};
+    const advKeys = ['reb', 'oreb', 'ast', 'stl', 'tov']; const advLabels = ['Rebotes Totales', 'Rebotes Ofensivos', 'Asistencias', 'Robos', 'Pérdidas']
+    let hAdv = '', aAdv = ''
 
-window.closePublicStatsModal = () => { document.getElementById('public-stats-modal').classList.add('hidden'); };
+    advKeys.forEach((k, i) => {
+        const isInverse = (k === 'tov'); const res = buildStatRow(advLabels[i], sHome[k], sAway[k], isInverse)
+        hAdv += res.hRow; aAdv += res.aRow
+    })
+    
+    document.getElementById('ps-home-advanced').innerHTML = hAdv; document.getElementById('ps-away-advanced').innerHTML = aAdv
+    document.getElementById('public-stats-modal').classList.remove('hidden')
+
+}
+
+window.closePublicStatsModal = () => { document.getElementById('public-stats-modal').classList.add('hidden')}
 
 function renderStandings(teams, matches) 
 {
@@ -545,116 +681,166 @@ function renderStandings(teams, matches)
                 standings[hIdx].pf += hPts; standings[hIdx].pc += aPts
                 standings[aIdx].pf += aPts; standings[aIdx].pc += hPts
 
-                if (hPts > aPts) { standings[hIdx].pg++; standings[hIdx].pts += 2; standings[aIdx].pp++; standings[aIdx].pts += 1; } 
-                else { standings[aIdx].pg++; standings[aIdx].pts += 2; standings[hIdx].pp++; standings[hIdx].pts += 1; }
+                if (hPts > aPts) 
+                { 
+                    standings[hIdx].pg++
+                    standings[hIdx].pts += 2
+                    standings[aIdx].pp++
+                    standings[aIdx].pts += 1 
+                } 
+
+                else 
+                { 
+                    standings[aIdx].pg++
+                    standings[aIdx].pts += 2
+                    standings[hIdx].pp++
+                    standings[hIdx].pts += 1
+                }
             }
         }
     })
 
-    standings.forEach(t => { t.pct = t.pj > 0 ? (t.pg / t.pj) : 0; });
+    standings.forEach(t => { t.pct = t.pj > 0 ? (t.pg / t.pj) : 0;})
 
     standings.sort((a, b) => 
     {
-        if (Math.abs(b.pct - a.pct) > 0.0001) return b.pct - a.pct;
-        if (b.pts !== a.pts) return b.pts - a.pts;
+
+        if (Math.abs(b.pct - a.pct) > 0.0001) return b.pct - a.pct
+        if (b.pts !== a.pts) return b.pts - a.pts
         
-        let currentTiedGroup = standings.filter(t => Math.abs(t.pct - a.pct) < 0.0001 && t.pts === a.pts);
+        let currentTiedGroup = standings.filter(t => Math.abs(t.pct - a.pct) < 0.0001 && t.pts === a.pts)
 
         while (currentTiedGroup.length > 1) 
         {
-            const teamNames = currentTiedGroup.map(t => t.name);
+            const teamNames = currentTiedGroup.map(t => t.name)
+
             const tiedMatches = matches.filter(m => 
                 teamNames.includes(m.home) && teamNames.includes(m.away) && 
                 m.homePts !== "-" && m.awayPts !== "-"
-            );
+            )
 
-            let groupStats = {};
-            currentTiedGroup.forEach(t => groupStats[t.name] = { pts: 0, diff: 0, pf: 0, pc: 0 });
+            let groupStats = {}
+            currentTiedGroup.forEach(t => groupStats[t.name] = { pts: 0, diff: 0, pf: 0, pc: 0 })
 
-            tiedMatches.forEach(m => {
-                const h = parseInt(m.homePts), v = parseInt(m.awayPts);
-                groupStats[m.home].pts += (h > v ? 2 : 1);
-                groupStats[m.home].diff += (h - v);
-                groupStats[m.home].pf += h;
-                groupStats[m.home].pc += v;
+            tiedMatches.forEach(m => 
+            {
+                const h = parseInt(m.homePts), v = parseInt(m.awayPts)
+                groupStats[m.home].pts += (h > v ? 2 : 1)
+                groupStats[m.home].diff += (h - v)
+                groupStats[m.home].pf += h
+                groupStats[m.home].pc += v
                 
-                groupStats[m.away].pts += (v > h ? 2 : 1);
-                groupStats[m.away].diff += (v - h);
-                groupStats[m.away].pf += v;
-                groupStats[m.away].pc += h;
-            });
+                groupStats[m.away].pts += (v > h ? 2 : 1)
+                groupStats[m.away].diff += (v - h)
+                groupStats[m.away].pf += v
+                groupStats[m.away].pc += h
+            })
 
-            const statA = groupStats[a.name];
-            const statB = groupStats[b.name];
+            const statA = groupStats[a.name]
+            const statB = groupStats[b.name]
 
-            if (statA.pts !== statB.pts) return statB.pts - statA.pts;
+            if (statA.pts !== statB.pts) return statB.pts - statA.pts
             
-            const nextTiedGroup = currentTiedGroup.filter(t => groupStats[t.name].pts === statA.pts);
+            const nextTiedGroup = currentTiedGroup.filter(t => groupStats[t.name].pts === statA.pts)
             
-            if (nextTiedGroup.length === currentTiedGroup.length) {
-                if (statA.diff !== statB.diff) return statB.diff - statA.diff;
-                
-                const diffTiedGroup = currentTiedGroup.filter(t => groupStats[t.name].diff === statA.diff);
-                if (diffTiedGroup.length === currentTiedGroup.length) {
+            if (nextTiedGroup.length === currentTiedGroup.length) 
+            {
+
+                if (statA.diff !== statB.diff) return statB.diff - statA.diff
+                const diffTiedGroup = currentTiedGroup.filter(t => groupStats[t.name].diff === statA.diff)
+
+                if (diffTiedGroup.length === currentTiedGroup.length) 
+                {
                     
-                    const aRatioH2H = statA.pc === 0 ? statA.pf : statA.pf / statA.pc;
-                    const bRatioH2H = statB.pc === 0 ? statB.pf : statB.pf / statB.pc;
-                    if (Math.abs(aRatioH2H - bRatioH2H) > 0.0001) return bRatioH2H - aRatioH2H;
+                    const aRatioH2H = statA.pc === 0 ? statA.pf : statA.pf / statA.pc
+                    const bRatioH2H = statB.pc === 0 ? statB.pf : statB.pf / statB.pc
+                    if (Math.abs(aRatioH2H - bRatioH2H) > 0.0001) return bRatioH2H - aRatioH2H
 
                     const ratioTiedGroup = currentTiedGroup.filter(t => {
-                        const tRatio = groupStats[t.name].pc === 0 ? groupStats[t.name].pf : groupStats[t.name].pf / groupStats[t.name].pc;
-                        return Math.abs(tRatio - aRatioH2H) < 0.0001;
-                    });
+                        const tRatio = groupStats[t.name].pc === 0 ? groupStats[t.name].pf : groupStats[t.name].pf / groupStats[t.name].pc
+                        return Math.abs(tRatio - aRatioH2H) < 0.0001
+                    })
 
-                    if (ratioTiedGroup.length === currentTiedGroup.length) {
-                        if (statA.pf !== statB.pf) return statB.pf - statA.pf;
-                        break; 
-                    } else {
-                        currentTiedGroup = ratioTiedGroup;
-                        continue;
+                    if (ratioTiedGroup.length === currentTiedGroup.length) 
+                    {
+                        if (statA.pf !== statB.pf) return statB.pf - statA.pf
+                        break
                     }
 
-                } else {
-                    currentTiedGroup = diffTiedGroup;
-                    continue;
+                    else 
+                    {
+                        currentTiedGroup = ratioTiedGroup
+                        continue
+                    }
+
+                } 
+                
+                else 
+                {
+                    currentTiedGroup = diffTiedGroup
+                    continue
                 }
-            } else {
-                currentTiedGroup = nextTiedGroup;
+
+            } 
+            
+            else 
+            {
+                currentTiedGroup = nextTiedGroup
             }
+
         }
 
-        const diffA = a.pf - a.pc;
-        const diffB = b.pf - b.pc;
-        if (diffA !== diffB) return diffB - diffA;
+        const diffA = a.pf - a.pc
+        const diffB = b.pf - b.pc
+        if (diffA !== diffB) return diffB - diffA
 
-        const ratioA = a.pc === 0 ? a.pf : a.pf / a.pc;
-        const ratioB = b.pc === 0 ? b.pf : b.pf / b.pc;
-        if (Math.abs(ratioA - ratioB) > 0.0001) return ratioB - ratioA;
+        const ratioA = a.pc === 0 ? a.pf : a.pf / a.pc
+        const ratioB = b.pc === 0 ? b.pf : b.pf / b.pc
+        if (Math.abs(ratioA - ratioB) > 0.0001) return ratioB - ratioA
+        return b.pf - a.pf
 
-        return b.pf - a.pf;
-    });
+    })
 
     standings.forEach((t, i) => 
     {
+
         const dg = t.pf - t.pc
         let dgClass = 'dg-neu'
         let dgText = dg
 
-        if(dg > 0) { dgClass = 'dg-pos'; dgText = '+' + dg }
-        if(dg < 0) { dgClass = 'dg-neg' }
+        if(dg > 0) 
+        { 
+            dgClass = 'dg-pos'
+            dgText = '+' + dg
+        }
+
+        if(dg < 0) 
+        { 
+            dgClass = 'dg-neg'
+        }
         
         const codeName = t.code ? t.code : t.name.substring(0,3).toUpperCase()
         const teamLink = `equipo.html?liga=liga_federal&equipo=${encodeURIComponent(t.name)}`
         
-        let pctDisplay = "0";
-        if (t.pj > 0) {
-            let p = Number(t.pct.toFixed(2));
-            if (p === 1) {
-                pctDisplay = "1";
-            } else if (p === 0) {
-                pctDisplay = "0";
-            } else {
-                pctDisplay = p.toString().replace(/^0/, '');
+        let pctDisplay = "0"
+
+        if (t.pj > 0) 
+        {
+
+            let p = Number(t.pct.toFixed(2))
+
+            if (p === 1) 
+            {
+                pctDisplay = "1"
+            } 
+            
+            else if (p === 0) 
+            {
+                pctDisplay = "0"
+            } 
+            else 
+            {
+                pctDisplay = p.toString().replace(/^0/, '')
             }
         }
 
@@ -678,10 +864,13 @@ function renderStandings(teams, matches)
             </tr>`
 
         tbody.innerHTML += row
+
     })
+
 }
 
-function formatDateInfo(dateString) {
+function formatDateInfo(dateString) 
+{
     if(!dateString) return { dayName: '-', dateShort: '-' }
     const dateObj = new Date(dateString + 'T00:00:00')
     const days = ['DO', 'LU', 'MA', 'MI', 'JU', 'VI', 'SA']
