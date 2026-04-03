@@ -1,99 +1,276 @@
-.dashboard-grid 
-{
+:root {
+    --bg-body: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    
+    --accent-blue: #2563eb;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-yellow: #f59e0b;
+    
+    --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+body { background-color: var(--bg-body); }
+
+/* =========================================
+   FIX: MANTENER HEADER SIEMPRE ARRIBA
+========================================= */
+.header {
+    z-index: 999 !important;
+}
+
+/* =========================================
+   HERO BANNER
+========================================= */
+.team-hero-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 130px 0 100px 0;
+    position: relative;
+    border-bottom: 4px solid var(--accent-blue);
+}
+
+.team-header-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.team-logo-wrapper {
+    width: 140px;
+    height: 140px;
+    background: var(--card-bg);
+    border-radius: 50%;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    border: 4px solid var(--card-bg);
+    z-index: 2; 
+}
+
+.team-logo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.team-title-box h1 {
+    color: #ffffff;
+    font-size: 2.8rem;
+    font-weight: 900;
+    font-family: 'Mulish', sans-serif;
+    margin: 0 0 12px 0;
+    letter-spacing: -1px;
+}
+
+.badges-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+
+.league-badge {
+    background: rgba(255,255,255,0.1);
+    color: #cbd5e1;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* =========================================
+   SECCIÓN DE ESTADÍSTICAS (SOBREPUESTA)
+========================================= */
+.team-stats-section {
+    margin-top: -60px;
+    position: relative;
+    z-index: 3; 
+    padding-bottom: 20px;
+}
+
+/* =========================================
+   FILA DE RÉCORD RÁPIDO
+========================================= */
+.quick-record-row {
     display: grid;
-    grid-template-columns: 250px 1fr 1fr; 
-    gap: 30px; 
-    margin-bottom: 40px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
-@media (max-width: 1100px) 
-{
-    .dashboard-grid { grid-template-columns: 1fr 1fr; }
-    .dashboard-grid > div:first-child { grid-column: 1 / -1; } 
-    .summary-col { flex-direction: row; flex-wrap: wrap; } 
-    .summary-card { flex: 1 1 200px; }
+.record-card {
+    background: var(--card-bg);
+    padding: 25px 20px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    border: 1px solid var(--border-color);
 }
 
-@media (max-width: 768px) 
-{
-    .dashboard-grid { grid-template-columns: 1fr; }
-    .summary-col { flex-direction: column; }
+.rc-label { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.rc-value { font-size: 2.5rem; font-weight: 900; color: var(--text-main); font-family: 'Mulish', sans-serif; line-height: 1; }
+
+.record-card.win .rc-value { color: var(--accent-green); }
+.record-card.loss .rc-value { color: var(--accent-red); }
+.record-card.highlight { background: var(--accent-blue); border-color: var(--accent-blue); }
+.record-card.highlight .rc-label { color: rgba(255,255,255,0.8); }
+.record-card.highlight .rc-value { color: #ffffff; }
+
+/* =========================================
+   GRILLA DETALLADA: DISEÑO COMPARATIVO (NUEVO)
+========================================= */
+.adv-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
 }
 
-.section-title 
-{ 
-    font-family: 'Mulish', sans-serif; 
-    font-size: 1.1rem; 
-    color: var(--independence); 
-    margin-bottom: 15px; 
-    font-weight: 800; 
+.adv-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
 }
 
-body.dark-mode .section-title 
-{ 
-    color: #fff; 
+.adv-card-header {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid var(--bg-body);
+    padding-bottom: 15px;
 }
 
-.summary-col 
-{ 
-    display: flex; 
-    flex-direction: column;
-    gap: 15px; 
+.adv-card-header i { color: var(--accent-blue); font-size: 1.3rem; }
+
+.adv-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* CLASES DE COMPARATIVA (A FAVOR vs EN CONTRA) */
+.adv-item.split {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--border-color);
 }
 
-.summary-card 
-{
-        background: #fff; 
-        border: 2px solid var(--ghost-white-2); 
-        border-radius: 12px;
-        padding: 15px 20px; 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
-        transition: transform 0.2s ease;
+.adv-item.header-split {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 8px;
 }
 
-.summary-card:hover 
-{ 
-    transform: translateX(5px); 
-    border-color: var(--primary); 
+.col-fav { font-size: 0.75rem; font-weight: 900; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px; }
+.col-con { font-size: 0.75rem; font-weight: 900; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px; }
+
+.adv-lbl { font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.2; }
+
+/* Cajas de valores */
+.val-fav { 
+    font-size: 1.15rem; font-weight: 900; color: var(--accent-blue); 
+    background: rgba(37,99,235,0.1); padding: 6px 0; border-radius: 8px; margin: 0 10px; 
 }
-        
-body.dark-mode .summary-card 
-{ 
-    background: #1e1e1e; 
-    border-color: #333; 
+.val-con { 
+    font-size: 1.15rem; font-weight: 900; color: var(--accent-red); 
+    background: rgba(239,68,68,0.1); padding: 6px 0; border-radius: 8px; margin: 0 10px; 
 }
 
-body.dark-mode .summary-card:hover { border-color: #4dabf7; }
-        
-        .card-left { display: flex; align-items: center; gap: 15px; }
-        .stat-icon { font-size: 2rem; display: block; }
-        
-        .big-stat-val { font-size: 1.8rem; font-weight: 900; color: var(--primary); font-family: 'Mulish', sans-serif; line-height: 1; }
-        .big-stat-lbl { font-size: 0.95rem; color: #555; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
-        body.dark-mode .big-stat-lbl { color: #ddd; }
-        .sub-record { font-size: 0.8rem; color: #888; margin-top: 3px; font-weight: 600; text-transform: none; letter-spacing: 0; }
-        body.dark-mode .sub-record { color: #aaa; }
+/* Casos donde solo hay un valor */
+.adv-item.single {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--border-color);
+}
+.val-neutral { 
+    font-size: 1.1rem; font-weight: 900; color: var(--text-main); 
+    background: var(--bg-body); padding: 6px 14px; border-radius: 8px; 
+}
 
-        /* Columnas 2 y 3: Detalles Anchos */
-        .detailed-card {
-            background: #fff; border: 2px solid var(--ghost-white-2); border-radius: 12px;
-            padding: 30px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        }
-        body.dark-mode .detailed-card { background: #1e1e1e; border-color: #333; }
-        
-        .detailed-title { font-size: 1.2rem; font-weight: 800; color: var(--independence); margin-bottom: 25px; border-bottom: 1px solid var(--ghost-white-2); padding-bottom: 10px; }
-        body.dark-mode .detailed-title { color: #fff; border-color: #333; }
+/* =========================================
+   SECCIÓN DE PARTIDOS JUGADOS
+========================================= */
+.team-matches-section { padding: 20px 0 60px 0; }
 
-        .stat-list { display: flex; flex-direction: column; gap: 18px; } 
-        .stat-list-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px dashed #eee; }
-        body.dark-mode .stat-list-item { border-color: #333; }
-        .stat-list-item:last-child { border-bottom: none; padding-bottom: 0; }
-        
-        .stat-label { font-weight: 600; color: #555; font-size: 1.05rem; white-space: nowrap; }
-        body.dark-mode .stat-label { color: #bbb; }
-        .stat-value { font-weight: 800; font-size: 1.15rem; color: var(--independence); }
-        body.dark-mode .stat-value { color: #fff; }
+.section-title-main { 
+    font-size: 1.6rem; font-weight: 900; font-family: 'Mulish', sans-serif; 
+    color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; 
+}
+
+.matches-grid { display: flex; flex-direction: column; gap: 12px; }
+
+.match-item {
+    background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
+    padding: 15px 25px; display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow-soft);
+}
+
+.match-date { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); width: 90px; }
+.match-opp { display: flex; align-items: center; gap: 12px; flex: 1; }
+.opp-logo { width: 35px; height: 35px; object-fit: contain; }
+.opp-name { font-weight: 800; color: var(--text-main); font-size: 1.05rem; }
+.match-score { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.2rem; color: var(--text-main); }
+
+.res-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 800; margin-left: 10px; background: var(--bg-body); color: var(--text-muted); }
+.res-badge.text-green { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+.res-badge.text-red { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+/* =========================================
+   MEDIA QUERIES (RESPONSIVE)
+========================================= */
+@media (max-width: 1024px) {
+    .quick-record-row { grid-template-columns: repeat(2, 1fr); }
+    .adv-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .adv-stats-grid .adv-card:nth-child(3) { grid-column: 1 / -1; }
+}
+
+@media (max-width: 768px) {
+    .team-hero-banner { padding: 100px 0 80px 0; text-align: center; }
+    .team-header-content { flex-direction: column; gap: 15px; }
+    .team-title-box h1 { font-size: 2rem; }
+    .badges-row { justify-content: center; }
+    .adv-stats-grid { grid-template-columns: 1fr; }
+    .adv-stats-grid .adv-card:nth-child(3) { grid-column: auto; }
+    
+    .val-fav, .val-con { margin: 0 5px; } /* Ajuste de margen en celulares */
+    
+    .match-item { flex-wrap: wrap; gap: 15px; justify-content: center; text-align: center; }
+    .match-date { width: 100%; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; }
+    .match-opp { justify-content: center; width: 100%; }
+    .match-score { width: 100%; justify-content: center; }
+}
+
+/* =========================================
+   DARK MODE
+========================================= */
+body.dark-mode {
+    --bg-body: #0f172a;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+}
+
+body.dark-mode .team-logo-wrapper { background: #0f172a; border-color: #0f172a; }
+body.dark-mode .adv-card-header, body.dark-mode .adv-item.split, body.dark-mode .adv-item.header-split, body.dark-mode .adv-item.single { border-bottom-color: #334155; }
+body.dark-mode .match-date { border-bottom-color: #334155; }
+
+body.dark-mode .val-fav { background: rgba(59,130,246,0.15); color: #60a5fa; }
+body.dark-mode .col-fav { color: #60a5fa; }
+body.dark-mode .val-con { background: rgba(239,68,68,0.15); color: #f87171; }
+body.dark-mode .col-con { color: #f87171; }
+body.dark-mode .val-neutral { background: #0f172a; color: #f8fafc; }
