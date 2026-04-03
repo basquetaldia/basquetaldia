@@ -1,8 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
 
-const firebaseConfig = 
-{
+const firebaseConfig = {
     apiKey: "AIzaSyAZsBvyg9LV72Qv1_bwXKvISJ72rBRD4E8",
     authDomain: "basquet-al-dia.firebaseapp.com",
     projectId: "basquet-al-dia",
@@ -22,11 +21,12 @@ const leagueNames = {
     "liga_nacional": "Liga Nacional",
     "liga_argentina": "Liga Argentina",
     "liga_federal": "Liga Federal",
+    "pre_liga_metropolitana": "Pre Liga Metro",
     "liga_proximo": "Liga Proximo"
 }
 
-async function loadTeamData() 
-{
+async function loadTeamData() {
+
     if(!league || !teamName) 
     {
         document.getElementById('t-name').innerText = "Equipo no encontrado"
@@ -35,33 +35,43 @@ async function loadTeamData()
 
     document.getElementById('t-league').innerText = leagueNames[league] || "Liga Desconocida"
 
-    try 
-    {
+    try {
+
         const docRef = doc(dbFire, league, "data_v1")
         const docSnap = await getDoc(docRef)
 
         if (docSnap.exists()) 
         {
+
             const db = docSnap.data()
-            
             const teamInfo = db.teams.find(t => t.name === teamName)
 
-            if(teamInfo)
+            if(teamInfo) 
             {
+
                 document.getElementById('t-name').innerText = teamInfo.name
                 document.getElementById('t-logo').src = teamInfo.logo
+                const stadiumElement = document.getElementById('t-stadium')
+
+                if(stadiumElement) 
+                {
+                    stadiumElement.innerHTML = `<i class="ri-map-pin-line"></i> ${teamInfo.stadium && teamInfo.stadium.trim() !== '' ? teamInfo.stadium : 'Estadio a definir'}`
+                }
+
             } 
+            
             else 
             {
                 document.getElementById('t-name').innerText = teamName
             }
 
             const teamMatches = db.matches.filter(m => m.home === teamName || m.away === teamName)
-            calculateStats(teamMatches, teamName)
+            calculateStats(teamMatches, teamName, db)
 
         }
 
     } 
+    
     catch (error) 
     {
         console.error("Error:", error)
@@ -69,17 +79,19 @@ async function loadTeamData()
 
 }
 
-function calculateStats(matches, team) 
-{
+function calculateStats(matches, team, db) {
 
     let pj = 0, pg = 0, pp = 0, pf = 0, pc = 0
     let otGames = 0, otWins = 0, otLosses = 0
     let statsPj = 0
+
     let q1 = 0, q2 = 0, q3 = 0, q4 = 0, ot = 0
     let reb = 0, oreb = 0, ast = 0, stl = 0, tov = 0
 
-    matches.forEach(m => 
-    {
+    let opp_q1 = 0, opp_q2 = 0, opp_q3 = 0, opp_q4 = 0, opp_ot = 0
+    let opp_reb = 0, opp_oreb = 0, opp_ast = 0, opp_stl = 0, opp_tov = 0
+
+    matches.forEach(m => {
 
         if(m.homePts === "-" || m.awayPts === "-") return
         
@@ -87,7 +99,7 @@ function calculateStats(matches, team)
         const ptsFav = isHome ? parseInt(m.homePts) : parseInt(m.awayPts)
         const ptsCon = isHome ? parseInt(m.awayPts) : parseInt(m.homePts)
         
-        if(!isNaN(ptsFav) && !isNaN(ptsCon))
+        if(!isNaN(ptsFav) && !isNaN(ptsCon)) 
         {
             pj++
             pf += ptsFav
@@ -100,6 +112,7 @@ function calculateStats(matches, team)
         {
 
             const teamStats = isHome ? m.stats.home : m.stats.away
+            const oppStats = isHome ? m.stats.away : m.stats.home
 
             let playedOT = false
             if (m.stats.home && m.stats.home.ot1 !== undefined && m.stats.home.ot1 !== '') playedOT = true
@@ -112,39 +125,52 @@ function calculateStats(matches, team)
                 else otLosses++
             }
 
-            if(teamStats) 
+            if(teamStats && Object.keys(teamStats).length > 0) 
             {
+
                 statsPj++
                 q1 += parseInt(teamStats.q1) || 0
                 q2 += parseInt(teamStats.q2) || 0
                 q3 += parseInt(teamStats.q3) || 0
                 q4 += parseInt(teamStats.q4) || 0
-                
-                Object.keys(teamStats).forEach(key => 
-                {
-                    if(key.startsWith('ot')) ot += parseInt(teamStats[key]) || 0
-                })
+                Object.keys(teamStats).forEach(key => { if(key.startsWith('ot')) ot += parseInt(teamStats[key]) || 0 })
 
                 reb += parseInt(teamStats.reb) || 0
                 oreb += parseInt(teamStats.oreb) || 0
                 ast += parseInt(teamStats.ast) || 0
                 stl += parseInt(teamStats.stl) || 0
                 tov += parseInt(teamStats.tov) || 0
+
+                if(oppStats) 
+                {
+
+                    opp_q1 += parseInt(oppStats.q1) || 0
+                    opp_q2 += parseInt(oppStats.q2) || 0
+                    opp_q3 += parseInt(oppStats.q3) || 0
+                    opp_q4 += parseInt(oppStats.q4) || 0
+                    Object.keys(oppStats).forEach(key => { if(key.startsWith('ot')) opp_ot += parseInt(oppStats[key]) || 0 })
+
+                    opp_reb += parseInt(oppStats.reb) || 0
+                    opp_oreb += parseInt(oppStats.oreb) || 0
+                    opp_ast += parseInt(oppStats.ast) || 0
+                    opp_stl += parseInt(oppStats.stl) || 0
+                    opp_tov += parseInt(oppStats.tov) || 0
+                }
             }
-
         }
-
     })
 
     document.getElementById('s-pj').innerText = pj
     document.getElementById('s-pg').innerText = pg
     document.getElementById('s-pp').innerText = pp
+    const winPct = pj > 0 ? Math.round((pg / pj) * 100) : 0
+    document.getElementById('s-pct').innerText = `${winPct}%`
 
     document.getElementById('s-ot-games').innerText = otGames
     document.getElementById('s-ot-rec').innerText = `${otWins}-${otLosses}`
 
-    const ppp = pj > 0 ? (pf / pj).toFixed(1) : "0.0";
-    const pcp = pj > 0 ? (pc / pj).toFixed(1) : "0.0";
+    const ppp = pj > 0 ? (pf / pj).toFixed(1) : "0.0"
+    const pcp = pj > 0 ? (pc / pj).toFixed(1) : "0.0"
     document.getElementById('s-ppp').innerText = ppp
     document.getElementById('s-pcp').innerText = pcp
 
@@ -156,12 +182,90 @@ function calculateStats(matches, team)
     document.getElementById('s-q4').innerText = calcAvg(q4, statsPj)
     document.getElementById('s-ot').innerText = calcAvg(ot, statsPj)
 
+    document.getElementById('s-opp-q1').innerText = calcAvg(opp_q1, statsPj)
+    document.getElementById('s-opp-q2').innerText = calcAvg(opp_q2, statsPj)
+    document.getElementById('s-opp-q3').innerText = calcAvg(opp_q3, statsPj)
+    document.getElementById('s-opp-q4').innerText = calcAvg(opp_q4, statsPj)
+    document.getElementById('s-opp-ot').innerText = calcAvg(opp_ot, statsPj)
+
     document.getElementById('s-reb').innerText = calcAvg(reb, statsPj)
     document.getElementById('s-oreb').innerText = calcAvg(oreb, statsPj)
     document.getElementById('s-ast').innerText = calcAvg(ast, statsPj)
     document.getElementById('s-stl').innerText = calcAvg(stl, statsPj)
     document.getElementById('s-tov').innerText = calcAvg(tov, statsPj)
-    
+
+    document.getElementById('s-opp-reb').innerText = calcAvg(opp_reb, statsPj)
+    document.getElementById('s-opp-oreb').innerText = calcAvg(opp_oreb, statsPj)
+    document.getElementById('s-opp-ast').innerText = calcAvg(opp_ast, statsPj)
+    document.getElementById('s-opp-stl').innerText = calcAvg(opp_stl, statsPj)
+    document.getElementById('s-opp-tov').innerText = calcAvg(opp_tov, statsPj)
+
+    let matchesHtml = ''
+
+    matches.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(m => {
+
+        let dateShort = m.date
+
+        if(m.date && m.date.includes('-')) 
+        {
+            const parts = m.date.split('-')
+            if(parts.length === 3) dateShort = `${parts[2]}/${parts[1]}/${parts[0]}`
+        }
+        
+        const isHome = m.home === team
+        const ptsFav = isHome ? m.homePts : m.awayPts
+        const ptsCon = isHome ? m.awayPts : m.homePts
+        const oppName = isHome ? m.away : m.home
+        
+        const oppObj = db.teams.find(t => t.name === oppName)
+        const oppLogo = oppObj ? oppObj.logo : 'assets/image/favicon.png'
+        const homeOrAwayText = isHome ? 'vs' : '@'
+        
+        let resultClass = ''
+        let resultText = '-'
+
+        if(ptsFav !== '-' && ptsCon !== '-') 
+        {
+
+            const numFav = parseInt(ptsFav)
+            const numCon = parseInt(ptsCon)
+
+            if(numFav > numCon) 
+            { 
+                resultClass = 'text-green'
+                resultText = 'V'
+            }
+
+            else if(numFav < numCon) 
+            { 
+                resultClass = 'text-red'
+                resultText = 'D'
+            }
+
+        }
+
+        matchesHtml += `
+        <div class="match-item">
+            <div class="match-date">${dateShort}</div>
+            <div class="match-opp">
+                <span style="color:var(--text-muted); font-size:0.8rem; font-weight:800; margin-right:5px; width: 20px; display:inline-block;">${homeOrAwayText}</span>
+                <img src="${oppLogo}" class="opp-logo">
+                <span class="opp-name">${oppName}</span>
+            </div>
+            <div class="match-score">
+                <span class="score-fav ${resultClass}">${ptsFav}</span> - <span class="score-con">${ptsCon}</span>
+                <span class="res-badge ${resultClass}">${resultText}</span>
+            </div>
+        </div>
+        `
+    })
+
+    const matchesListContainer = document.getElementById('team-matches-list')
+
+    if (matchesListContainer) 
+    {
+        matchesListContainer.innerHTML = matchesHtml || '<p style="text-align:center; color:var(--text-muted); padding: 20px;">Este equipo aún no ha registrado partidos.</p>'
+    }
 }
 
 loadTeamData()
