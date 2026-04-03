@@ -15,25 +15,24 @@
     <!-- ICONS -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
-
 </head>
 <body>
 
     <header class="header" id="header" data-header>
 
         <div class="container" style="max-width: 1350px !important;">
-
+            
             <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
             <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
 
             <nav class="navbar">
 
                 <ul class="navbar-list">
-                    <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li>
-                    <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
+                    <!-- <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li> -->
+                    <!-- <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li> -->
                     <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
-                    <li><a href="ligaproximo.html" class="navbar-link">Liga Proximo</a></li>
-                    <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li>
+                    <li><a href="premetro.html" class="navbar-link">Pre Liga Metro</a></li>
+                    <!-- <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li> -->
                 </ul>
 
             </nav>
@@ -44,162 +43,213 @@
 
     <main>
 
-        <section class="hero" id="hero">
+        <div class="team-hero-banner">
 
             <div class="container">
 
-                <div class="hero-content">
-                    <h1 class="h1 hero-title" id="t-name">Cargando...</h1>
-                    <h2 id="t-league" style="color: var(--primary); font-family: 'Mulish', sans-serif; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase;">Buscando datos</h2>
+                <div class="team-header-content">
+
+                    <div class="team-logo-wrapper">
+                        <img id="t-logo" src="assets/image/favicon.png" alt="Escudo">
+                    </div>
+
+                    <div class="team-title-box">
+
+                        <h1 id="t-name">Cargando Equipo...</h1>
+                        
+                        <div class="badges-row">
+
+                            <span id="t-league" class="league-badge">Buscando datos</span>
+
+                            <span id="t-stadium" style="color: #cbd5e1; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                                <i class="ri-map-pin-line"></i> Cargando estadio...
+                            </span>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <figure class="hero-banner">
-                    <img id="t-logo" src="assets/image/favicon.png" alt="Escudo del equipo" style="max-height: 250px; width: 100%; object-fit: contain;">
-                </figure>
+            </div>
+
+        </div>
+
+        <section class="team-stats-section">
+
+            <div class="container">
+                
+                <div class="quick-record-row">
+
+                    <div class="record-card">
+                        <div class="rc-label">Partidos Jugados</div>
+                        <div class="rc-value" id="s-pj">0</div>
+                    </div>
+
+                    <div class="record-card win">
+                        <div class="rc-label">Victorias</div>
+                        <div class="rc-value" id="s-pg">0</div>
+                    </div>
+
+                    <div class="record-card loss">
+                        <div class="rc-label">Derrotas</div>
+                        <div class="rc-value" id="s-pp">0</div>
+                    </div>
+
+
+                    <div class="record-card highlight">
+                        <div class="rc-label">% Victoria</div>
+                        <div class="rc-value" id="s-pct">0%</div>
+                    </div>
+
+                </div>
+
+                <div class="adv-stats-grid">
+                    
+                    <div class="adv-card">
+
+                        <div class="adv-card-header">
+                            <i class="ri-fire-fill"></i> Rendimiento Global
+                        </div>
+
+                        <div class="adv-list">
+                            
+                            <div class="adv-item header-split">
+                                <span class="col-fav">Equipo</span>
+                                <span></span>
+                                <span class="col-con">Rival</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-ppp">0.0</span>
+                                <span class="adv-lbl">Puntos Promedio</span>
+                                <span class="val-con" id="s-pcp">0.0</span>
+                            </div>
+                            
+                            <div class="adv-item single" style="margin-top: 15px;">
+                                <span class="adv-lbl" style="text-align: left;">Tiempos Supl. Jugados</span>
+                                <span class="val-neutral" id="s-ot-games">0</span>
+                            </div>
+
+                            <div class="adv-item single" style="border:none;">
+                                <span class="adv-lbl" style="text-align: left;">Récord en Supl.</span>
+                                <span class="val-neutral" id="s-ot-rec">0-0</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="adv-card">
+
+                        <div class="adv-card-header">
+                            <i class="ri-timer-line"></i> Puntos por Cuarto
+                        </div>
+
+                        <div class="adv-list">
+
+                            <div class="adv-item header-split">
+                                <span class="col-fav">A Favor</span>
+                                <span></span>
+                                <span class="col-con">En Contra</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-q1">0.0</span>
+                                <span class="adv-lbl">1° Cuarto</span>
+                                <span class="val-con" id="s-opp-q1">0.0</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-q2">0.0</span>
+                                <span class="adv-lbl">2° Cuarto</span>
+                                <span class="val-con" id="s-opp-q2">0.0</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-q3">0.0</span>
+                                <span class="adv-lbl">3° Cuarto</span>
+                                <span class="val-con" id="s-opp-q3">0.0</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-q4">0.0</span>
+                                <span class="adv-lbl">4° Cuarto</span>
+                                <span class="val-con" id="s-opp-q4">0.0</span>
+                            </div>
+
+                            <div class="adv-item split" style="border:none;">
+                                <span class="val-fav" id="s-ot">0.0</span>
+                                <span class="adv-lbl">Suplementario</span>
+                                <span class="val-con" id="s-opp-ot">0.0</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="adv-card">
+
+                        <div class="adv-card-header">
+                            <i class="ri-bar-chart-box-line"></i> Generales (Promedio)
+                        </div>
+
+                        <div class="adv-list">
+
+                            <div class="adv-item header-split">
+                                <span class="col-fav">A Favor</span>
+                                <span></span>
+                                <span class="col-con">En Contra</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-reb">0.0</span>
+                                <span class="adv-lbl">Rebotes Totales</span>
+                                <span class="val-con" id="s-opp-reb">0.0</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-oreb">0.0</span>
+                                <span class="adv-lbl">Rebotes Ofens.</span>
+                                <span class="val-con" id="s-opp-oreb">0.0</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-ast">0.0</span>
+                                <span class="adv-lbl">Asistencias</span>
+                                <span class="val-con" id="s-opp-ast">0.0</span>
+                            </div>
+
+                            <div class="adv-item split">
+                                <span class="val-fav" id="s-stl">0.0</span>
+                                <span class="adv-lbl">Robos</span>
+                                <span class="val-con" id="s-opp-stl">0.0</span>
+                            </div>
+
+                            <div class="adv-item split" style="border:none;">
+                                <span class="val-fav" id="s-tov">0.0</span>
+                                <span class="adv-lbl">Pérdidas</span>
+                                <span class="val-con" id="s-opp-tov">0.0</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </section>
 
-        <section class="about" id="stats-section">
-            
+        <section class="team-matches-section">
+
             <div class="container">
-                
-                <div class="dashboard-grid">
-                    
-                    <div>
 
-                        <div class="section-title">Resumen de Temporada</div>
-                        <div class="summary-col">
-                            
-                            <div class="summary-card">
-                                <div class="card-left"><i class="ri-basketball-line stat-icon" style="color:#3498db;"></i><div class="big-stat-lbl">Partidos Jugados</div></div>
-                                <div class="big-stat-val" id="s-pj">0</div>
-                            </div>
-                            
-                            <div class="summary-card">
-                                <div class="card-left"><i class="ri-check-line stat-icon" style="color:#2ecc71;"></i><div class="big-stat-lbl">Partidos Ganados</div></div>
-                                <div class="big-stat-val" id="s-pg" style="color:#2ecc71;">0</div>
-                            </div>
-                            
-                            <div class="summary-card">
-                                <div class="card-left"><i class="ri-close-line stat-icon" style="color:#e74c3c;"></i><div class="big-stat-lbl">Partidos Perdidos</div></div>
-                                <div class="big-stat-val" id="s-pp" style="color:#e74c3c;">0</div>
-                            </div>
-
-                            <div class="summary-card">
-
-                                <div class="card-left">
-
-                                    <i class="ri-fire-line stat-icon" style="color:#f39c12;"></i>
-
-                                    <div>
-                                        <div class="big-stat-lbl">Tiempos Supl.</div>
-                                        <div class="sub-record">Récord: <span id="s-ot-rec" style="font-weight: 800;">0-0</span></div>
-                                    </div>
-
-                                </div>
-
-                                <div class="big-stat-val" id="s-ot-games" style="color:#f39c12;">0</div>
-
-                            </div>
-                            
-                            <div class="summary-card">
-
-                                <div class="card-left">
-
-                                    <i class="ri-arrow-up-circle-fill stat-icon" style="color:#9b59b6;"></i>
-
-                                    <div class="big-stat-lbl">Pts a Favor <br>
-                                        <span style="font-size:0.7rem; color:#888;">(Por Juego)</span>
-                                    </div>
-
-                                </div>
-
-                                <div class="big-stat-val" id="s-ppp">0.0</div>
-
-                            </div>
-                            
-                            <div class="summary-card">
-                                <div class="card-left"><i class="ri-arrow-down-circle-fill stat-icon" style="color:#7f8c8d;"></i><div class="big-stat-lbl">Pts en Contra <br><span style="font-size:0.7rem; color:#888;">(Por Juego)</span></div></div>
-                                <div class="big-stat-val" id="s-pcp">0.0</div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="detailed-card">
-
-                        <div class="detailed-title" style="width: 300px;">Puntos por Cuarto</div>
-
-                        <div class="stat-list">
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">1° Cuarto</span>
-                                <span class="stat-value" id="s-q1">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">2° Cuarto</span>
-                                <span class="stat-value" id="s-q2">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">3° Cuarto</span>
-                                <span class="stat-value" id="s-q3">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">4° Cuarto</span>
-                                <span class="stat-value" id="s-q4">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">Suplementario</span>
-                                <span class="stat-value" id="s-ot">0.0</span>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="detailed-card">
-
-                        <div class="detailed-title">Generales</div>
-
-                        <div class="stat-list">
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">Rebotes Totales</span>
-                                <span class="stat-value" id="s-reb">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">Rebotes Ofensivos</span>
-                                <span class="stat-value" id="s-oreb">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">Asistencias</span>
-                                <span class="stat-value" id="s-ast">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">Robos</span>
-                                <span class="stat-value" id="s-stl">0.0</span>
-                            </div>
-
-                            <div class="stat-list-item">
-                                <span class="stat-label">Pérdidas</span>
-                                <span class="stat-value" id="s-tov">0.0</span>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div> 
+                <h2 class="section-title-main"><i class="ri-calendar-todo-line"></i> Historial de Partidos</h2>
+                <div id="team-matches-list" class="matches-grid">
+                    <p style="text-align:center; color:var(--text-muted); padding: 20px;">Cargando partidos...</p>
+                </div>
 
             </div>
 
@@ -215,22 +265,10 @@
 
                 <div class="footer-brand">
 
-                    <a href="#" class="logo">
-                        <image src="assets/image/favicon.png" width="100px">
-                    </a>
-
+                    <a href="#" class="logo"><img src="assets/image/favicon.png" width="100px"></a>
                     <p class="footer-text">Seguinos en nuestras redes!</p>
-
                     <ul class="social-list">
-
-                        <li>
-
-                            <a href="https://www.instagram.com/basquet.al.dia" class="social-link" target="_blank">
-                                <i class="ri-instagram-line"></i>
-                            </a>
-
-                        </li>
-
+                        <li><a href="https://www.instagram.com/basquet.al.dia" class="social-link" target="_blank"><i class="ri-instagram-line"></i></a></li>
                     </ul>
 
                 </div>
@@ -238,31 +276,12 @@
                 <div class="footer-link-box">
 
                     <ul class="footer-list">
-
-                        <li>
-                            <p class="footer-item-title">Competencias</p>
-                        </li>
-
-                        <li>
-                            <a href="liganacional.html" class="footer-link">Liga Nacional</a>
-                        </li>
-
-                        <li>
-                            <a href="ligaargentina.html" class="footer-link">Liga Argentina</a>
-                        </li>
-
-                        <li>
-                            <a href="ligafederal.html" class="footer-link">Liga Federal</a>
-                        </li>
-
-                        <li>
-                            <a href="ligaproximo.html" class="footer-link">Liga Proximo</a>
-                        </li>
-
-                        <li>
-                            <a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a>
-                        </li>
-
+                        <li><p class="footer-item-title">Competencias</p></li>
+                        <!-- <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li> -->
+                        <!-- <li><a href="ligaargentina.html" class="footer-link">Liga Argentina</a></li> -->
+                        <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
+                        <li><a href="premetro.html" class="footer-link">Pre Liga Metro</a></li>
+                        <!-- <li><a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a></li> -->
                     </ul>
 
                 </div>
@@ -272,20 +291,9 @@
         </div>
 
         <div class="footer-botton">
-
             <div class="container">
-
-                <center>
-
-                    <p class="copyright">
-                        Desarrollado por
-                        <a href="https://www.instagram.com/pedro.miteff" target="_blank"> Pedro Miteff Canal </a>.
-                    </p>
-
-                </center>
-
+                <center><p class="copyright">Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.</p></center>
             </div>
-
         </div>
 
     </footer>
