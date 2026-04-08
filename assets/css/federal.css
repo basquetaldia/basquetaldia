@@ -14,7 +14,27 @@
 
 .hidden { display: none !important; }
 
-/* REGLAS DE SEGURIDAD PARA ALINEACIÓN */
+/* =========================================
+   REGLAS DE SEGURIDAD PARA ALINEACIÓN MÓVIL
+========================================= */
+body {
+    overflow-x: hidden; 
+    width: 100%;
+}
+
+.container {
+    width: 100% !important;
+    max-width: 1400px !important;
+    padding: 0 15px !important; 
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+section {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
 .stats-grid, .stat-card, .match-card-premium, .table-responsive {
     box-sizing: border-box !important;
 }
@@ -44,11 +64,17 @@
     align-items: center;
     flex-wrap: wrap;
     animation: fadeIn 0.4s ease;
+    width: 100%;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-select-wrapper {
+    width: 100%;
+    max-width: 400px;
 }
 
 .custom-select-wrapper label { 
@@ -62,7 +88,6 @@
 
 .custom-select { 
     width: 100%; 
-    min-width: 250px; 
     padding: 12px 16px; 
     border: 2px solid var(--border-color); 
     border-radius: 10px; 
@@ -98,16 +123,15 @@
 
 
 /* =========================================
-   GRILLA PRINCIPAL Y TARJETAS (ARREGLO DE ANCHO)
+   GRILLA PRINCIPAL Y TARJETAS
 ========================================= */
 .stats-grid { 
     display: grid; 
-    grid-template-columns: 1fr; 
+    grid-template-columns: minmax(0, 1fr); 
     gap: 30px; 
     margin-top: 40px; 
     align-items: start; 
     width: 100%;
-    max-width: 100%;
 }
 
 .stat-card { 
@@ -116,12 +140,9 @@
     box-shadow: var(--shadow-soft); 
     padding: 25px; 
     border: 1px solid var(--border-color); 
-    
-    /* FIX: Previene que la tarjeta rompa los límites del container */
     min-width: 0; 
-    max-width: 100%;
     width: 100%;
-    overflow: hidden;
+    overflow: hidden; 
 }
 
 .card-header-title { 
@@ -136,7 +157,7 @@
 }
 
 /* =========================================
-   DISEÑO DE PARTIDOS (CLÁSICO Y PREMIUM)
+   DISEÑO DE PARTIDOS
 ========================================= */
 .round-wrapper { margin-bottom: 20px; width: 100%; }
 
@@ -197,7 +218,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-width: 0; /* Previene desbordamiento de contenido */
+    min-width: 0;
 }
 
 .match-card-premium:hover { border-color: #cbd5e1; box-shadow: 0 8px 25px rgba(0,0,0,0.08); transform: translateY(-2px); }
@@ -206,9 +227,9 @@
 .team-premium-row.clickable { cursor: pointer; }
 .team-premium-row.clickable:hover { opacity: 0.7; }
 .team-brand-box { display: flex; align-items: center; gap: 15px; }
-.team-brand-box .team-logo { width: 45px; height: 45px; }
-.team-brand-box .team-name { font-weight: 900; font-size: 1.25rem; color: var(--black); }
+.team-logo { width: 45px; height: 45px; }
 .team-info-col { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+.team-name { font-weight: 900; font-size: 1.25rem; color: var(--black); }
 .team-record { font-size: 0.75rem; font-weight: 700; color: var(--cool-gray); margin-top: 2px; }
 
 .team-score-huge { 
@@ -249,21 +270,25 @@
 .btn-icon-only { flex: 0 0 auto !important; padding: 8px 12px; font-size: 1.1rem; justify-content: center; }
 
 /* =========================================
-   TABLA DE POSICIONES
+   TABLA DE POSICIONES (ANCHO COMPLETO / SIN SCROLL)
 ========================================= */
 .table-responsive { 
     width: 100%; 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch; 
-    display: block; /* Mantiene la barra de scroll de la tabla limitada a la tarjeta */
+    overflow: hidden; /* Prohíbe absolutamente el scroll horizontal */
 } 
-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 400px; }
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 0.95rem; 
+    table-layout: auto; /* Permite a la tabla comprimirse según la pantalla */
+}
 
 thead { background-color: transparent; border-bottom: 2px solid var(--border-color); }
-th { padding: 14px 8px; font-size: 0.8rem; text-transform: uppercase; font-weight: 800; text-align: center; letter-spacing: 0.5px; color: var(--cool-gray); }
-td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-weight: 600; color: var(--black); }
+th { padding: 12px 6px; font-size: 0.8rem; text-transform: uppercase; font-weight: 800; text-align: center; color: var(--cool-gray); }
+td { padding: 10px 6px; text-align: center; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-weight: 600; color: var(--black); }
 
-.cell-pos-box { width: 28px; height: 28px; background: #f1f5f9; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: 800; border-radius: 6px; margin: 0 auto; color: var(--black); font-size: 0.9rem;}
+.cell-pos-box { width: 26px; height: 26px; background: #f1f5f9; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: 800; border-radius: 6px; margin: 0 auto; color: var(--black); font-size: 0.85rem;}
 
 /* ALINEACIÓN BASE PARA MOBILE: CENTRADO TOTAL */
 .t-left { text-align: center; width: 100%; } 
@@ -272,13 +297,13 @@ td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--borde
 /* En mobile: Logo miniatura + Sigla. Nombre completo oculto */
 .t-logo { display: block; width: 18px; height: 18px; object-fit: contain; } 
 .t-name-full { display: none !important; } 
-.t-name-code { display: block !important; font-weight: 800; font-size: 0.95rem; color: var(--black); letter-spacing: 0.5px; text-align: center; }
+.t-name-code { display: block !important; font-weight: 800; font-size: 0.9rem; color: var(--black); letter-spacing: 0.5px; text-align: center; }
 
 td.col-pj { color: var(--cool-gray); font-weight: 700; }
 td.col-pg { color: var(--green); font-weight: 900; }
 td.col-pp { color: var(--red); font-weight: 900; }
 td.col-pf, td.col-pc { font-weight: 700; color: var(--cool-gray); }
-td.col-pct { color: var(--accent-color); font-weight: 900; font-size: 1.05rem; }
+td.col-pct { color: var(--accent-color); font-weight: 900; font-size: 1rem; }
 .dg-pos { color: var(--green); font-weight: 700; }
 .dg-neg { color: var(--red); font-weight: 700; }
 .dg-neu { color: var(--cool-gray); font-weight: 700; }
@@ -331,12 +356,10 @@ td.col-pct { color: var(--accent-color); font-weight: 900; font-size: 1.05rem; }
    MEDIA QUERIES (ADAPTACIÓN PERFECTA A CELULAR Y PC)
 ========================================= */
 @media (max-width: 991px) {
-    th, td { padding: 10px 4px; font-size: 0.85rem; }
     .stat-card { padding: 15px; }
 }
 
 @media (min-width: 992px) {
-    /* FIX PARA ESCRITORIO: minmax(0, 1fr) evita que el ancho colapse */
     .stats-grid { grid-template-columns: 400px minmax(0, 1fr); gap: 40px; }
     
     /* EN DESKTOP: Tabla alineada a la izquierda, escudo grande y nombre completo */
@@ -366,10 +389,20 @@ td.col-pct { color: var(--accent-color); font-weight: 900; font-size: 1.05rem; }
     .stats-grid-cols { grid-template-columns: 1fr; gap: 20px; } 
     .public-modal { padding: 20px; }
     
+    /* AJUSTE MÁXIMO DE COMPRESIÓN PARA LA TABLA EN CELULARES */
+    th, td { 
+        padding: 8px 2px; /* Margen interno al mínimo */
+        font-size: 0.7rem; /* Reducción de fuente para que entren las 8 columnas */
+    }
+    .t-logo { width: 14px; height: 14px; }
+    .cell-pos-box { width: 20px; height: 20px; font-size: 0.7rem; }
+    .team-cell { gap: 2px; }
+    .t-name-code { font-size: 0.75rem; }
+
     /* Ajustes Tarjeta Partido Premium en Mobile */
     .team-score-huge { font-size: 1.8rem; }
-    .team-brand-box .team-logo { width: 35px; height: 35px; }
-    .team-brand-box .team-name { font-size: 1.1rem; }
+    .team-logo { width: 35px; height: 35px; }
+    .team-name { font-size: 1.1rem; }
     
     /* Ajustes Tarjeta Clásica en Mobile */
     .team-name-match { max-width: 120px; }
