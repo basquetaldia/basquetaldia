@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liga Federal - Basquet Al Día</title>
@@ -12,37 +13,28 @@
     <!-- FAVICON -->
     <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
 
-    <!-- ICON -->
+    <!-- ICONS -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+
 </head>
 <body>
 
     <header class="header" id="header" data-header>
 
         <div class="container">
-            
-            <a href="index.html" class="logo">
-                <img src="assets/image/favicon.png" width="50px">
-            </a>
 
-            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn>
-                <i class="ri-menu-line"></i>
-            </button>
+            <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
+            <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
 
             <nav class="navbar">
 
                 <ul class="navbar-list">
-                    <!-- <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li> -->
-                    <!-- <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li> -->
                     <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
                     <li><a href="premetro.html" class="navbar-link">Pre Liga Metropolitana</a></li>
-                    <!-- <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li> -->
                 </ul>
 
-                <div class="header-actions">
-                    <a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a>
-                </div>
+                <div class="header-actions"><a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a></div>
 
             </nav>
 
@@ -59,13 +51,8 @@
                 <div class="container">
 
                     <div class="hero-content">
-
                         <h1 class="h1 hero-title">Liga Federal</h1>
-                        <p class="form-text" style="align-content: center;">
-                            <span><i class="ri-error-warning-line"></i></span>
-                            LA TERCERA CATEGORÍA DEL BASQUET ARGENTINO. CONSULTA TABLA Y RESULTADOS AQUÍ.
-                        </p>
-
+                        <p class="form-text" style="align-content: center;"><span><i class="ri-error-warning-line"></i></span> LA TERCERA CATEGORÍA DEL BASQUET ARGENTINO. CONSULTA TABLA Y RESULTADOS AQUÍ.</p>
                     </div>
 
                     <figure class="hero-banner"><img src="assets/image/federal.svg"></figure>
@@ -79,20 +66,13 @@
                 <div class="container">
 
                     <div class="filter-container" id="zone-filters">
-
+                        
                         <div class="custom-select-wrapper">
 
-                            <label for="conferenceSelect">Seleccionar CONFERENCIA</label>
+                            <label for="phaseSelect">Seleccionar FASE</label>
 
-                            <select id="conferenceSelect" class="custom-select" onchange="updateZoneOptions()">
-                                <option value="">Seleccionar...</option>
-                                <option value="NEA">NEA</option>
-                                <option value="NOA">NOA</option>
-                                <option value="Sudeste">Sudeste</option>
-                                <option value="Sur">Sur</option>
-                                <option value="Centro">Centro</option>
-                                <option value="Litoral">Litoral</option>
-                                <option value="Metropolitana">Metropolitana</option>
+                            <select id="phaseSelect" class="custom-select" onchange="loadData()">
+                                <option value="Fase Regular" selected>Fase Regular</option>
                             </select>
 
                         </div>
@@ -101,8 +81,34 @@
 
                             <label for="zoneSelect">Seleccionar ZONA</label>
 
-                            <select id="zoneSelect" class="custom-select" onchange="loadData()" disabled>
-                                <option value="">Esperando conferencia...</option>
+                            <select id="zoneSelect" class="custom-select" onchange="loadData()">
+
+                                <option value="">Seleccionar...</option>
+
+                                <optgroup label="Norte">
+                                    <option value="NEA Unica">NEA Única</option>
+                                    <option value="NOA Unica">NOA Única</option>
+                                </optgroup>
+
+                                <optgroup label="Sudeste / Sur">
+                                    <option value="Sudeste A">Sudeste A</option>
+                                    <option value="Sudeste B">Sudeste B</option>
+                                    <option value="Sur Unica">Sur Única</option>
+                                </optgroup>
+
+                                <optgroup label="Centro / Litoral">
+                                    <option value="Centro A">Centro A</option>
+                                    <option value="Centro B">Centro B</option>
+                                    <option value="Litoral A">Litoral A</option>
+                                    <option value="Litoral B">Litoral B</option>
+                                </optgroup>
+
+                                <optgroup label="Metropolitana">
+                                    <option value="Metropolitana A">Metro A</option>
+                                    <option value="Metropolitana B">Metro B</option>
+                                    <option value="Metropolitana C">Metro C</option>
+                                </optgroup>
+
                             </select>
 
                         </div>
@@ -112,14 +118,8 @@
                     <div class="filter-container hidden" id="daily-filters">
 
                         <div class="custom-select-wrapper" style="display:flex; align-items:flex-end; gap: 10px; max-width: 400px; margin: 0 auto; width: 100%;">
-
-                            <div style="flex:1;">
-                                <label for="dailyDateSelect">Fecha de los Partidos</label>
-                                <input type="date" id="dailyDateSelect" class="custom-select" style="min-width:auto;" onchange="loadDailyMatches()">
-                            </div>
-
+                            <div style="flex:1;"><label for="dailyDateSelect">Fecha de los Partidos</label><input type="date" id="dailyDateSelect" class="custom-select" style="min-width:auto;" onchange="loadDailyMatches()"></div>
                             <button class="btn-hoy" onclick="setToday()">HOY</button>
-
                         </div>
 
                     </div>
@@ -137,22 +137,11 @@
                         <div class="stat-card">
 
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-
                                 <h3 class="card-header-title" style="margin:0;">Partidos</h3>
-
-                                <div class="custom-select-wrapper">
-
-                                    <select id="teamFilterSelect" class="custom-select filter-mini" onchange="filterMatchesByTeam()" disabled>
-                                        <option value="">Todos los equipos</option>
-                                    </select>
-
-                                </div>
-
+                                <div class="custom-select-wrapper"><select id="teamFilterSelect" class="custom-select filter-mini" onchange="filterMatchesByTeam()" disabled><option value="">Todos los equipos</option></select></div>
                             </div>
 
-                            <div id="matches-container">
-                                <p style="text-align:center; color:#888; padding: 30px;">Selecciona una zona para ver los partidos.</p>
-                            </div>
+                            <div id="matches-container"><p style="text-align:center; color:#888; padding: 30px;">Selecciona una zona para ver los partidos.</p></div>
 
                         </div>
 
@@ -163,31 +152,8 @@
                             <div class="table-responsive">
 
                                 <table>
-
-                                    <thead>
-
-                                        <tr>
-                                            <th>Pos</th>
-                                            <th class="t-left">Equipo</th>
-                                            <th class="col-pg" title="Ganados">PG</th>
-                                            <th class="col-pp" title="Perdidos">PP</th>
-                                            <th class="col-pf" title="Puntos a Favor">PF</th>
-                                            <th class="col-pc" title="Puntos en Contra">PC</th>
-                                            <th class="col-pct" title="Porcentaje de Victorias">%</th>
-                                            <th class="col-pj" title="Jugados">PJ</th>
-                                            <th class="col-dg" title="Diferencia de Gol">DG</th>
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody id="standings-body">
-
-                                        <tr>
-                                            <td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td>
-                                        </tr>
-
-                                    </tbody>
-
+                                    <thead><tr><th>Pos</th><th class="t-left">Equipo</th><th class="col-pg" title="Ganados">PG</th><th class="col-pp" title="Perdidos">PP</th><th class="col-pf" title="Puntos a Favor">PF</th><th class="col-pc" title="Puntos en Contra">PC</th><th class="col-pct" title="Porcentaje de Victorias">%</th><th class="col-pj" title="Jugados">PJ</th><th class="col-dg" title="Diferencia de Gol">DG</th></tr></thead>
+                                    <tbody id="standings-body"><tr><td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr></tbody>
                                 </table>
 
                             </div>
@@ -197,11 +163,7 @@
                     </div>
 
                     <div id="view-daily-content" class="hidden">
-
-                        <div id="daily-matches-container">
-                            <p style="text-align:center; color:#888; padding: 30px;">Selecciona una fecha.</p>
-                        </div>
-
+                        <div id="daily-matches-container"><p style="text-align:center; color:#888; padding: 30px;">Selecciona una fecha.</p></div>
                     </div>
 
                 </div>
@@ -219,36 +181,17 @@
             <div class="container">
 
                 <div class="footer-brand">
-
-                    <a href="#" class="logo">
-                        <img src="assets/image/favicon.png" width="100px">
-                    </a>
-
+                    <a href="#" class="logo"><img src="assets/image/favicon.png" width="100px"></a>
                     <p class="footer-text">Seguinos en nuestras redes!</p>
-
-                    <ul class="social-list">
-
-                        <li>
-
-                            <a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank">
-                                <i class="ri-links-line"></i>
-                            </a>
-
-                        </li>
-
-                    </ul>
-
+                    <ul class="social-list"><li><a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank"><i class="ri-links-line"></i></a></li></ul>
                 </div>
 
                 <div class="footer-link-box">
 
                     <ul class="footer-list">
                         <li><p class="footer-item-title">Competencias</p></li>
-                        <!-- <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li> -->
-                        <!-- <li><a href="ligaargentina.html" class="footer-link">Liga Argentina</a></li> -->
                         <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
                         <li><a href="premetro.html" class="footer-link">Pre Liga Metropolitana</a></li>
-                        <!-- <li><a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a></li> -->
                     </ul>
 
                 </div>
@@ -258,95 +201,21 @@
         </div>
 
         <div class="footer-botton">
-
             <div class="container">
-
                 <center>
-                    <p class="copyright">
-                        Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.
-                    </p>
+                    <p class="copyright">Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.</p>
                 </center>
-
             </div>
-
         </div>
 
     </footer>
 
-    <div id="public-stats-modal" class="hidden">
-
-        <div class="modal-content-stats public-modal">
-
-            <button onclick="closePublicStatsModal()" class="close-modal-btn">X</button>
-
-            <div class="modal-header">
-                <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
-                <div id="ps-match-score" class="ps-score">0 - 0</div>
-            </div>
-
-            <div id="ps-stats-grid" class="stats-grid-cols">
-
-                <div class="stats-col">
-                    <h3 id="ps-home-name" class="team-title">Local</h3>
-                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
-                    <div id="ps-home-quarters" class="stat-list-public"></div>
-                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
-                    <div id="ps-home-advanced" class="stat-list-public"></div>
-                </div>
-
-                <div class="stats-col">
-                    <h3 id="ps-away-name" class="team-title">Visitante</h3>
-                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
-                    <div id="ps-away-quarters" class="stat-list-public"></div>
-                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
-                    <div id="ps-away-advanced" class="stat-list-public"></div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div id="comparison-modal" class="hidden">
-
-        <div class="modal-content-stats public-modal">
-
-            <button onclick="closeComparisonModal()" class="close-modal-btn">X</button>
-
-            <div class="modal-header">
-                <h2 style="margin-bottom: 5px;"><i class="ri-scales-3-line"></i> Comparativa de Equipos</h2>
-                <div class="ps-score" style="font-size: 1.1rem; color: var(--cool-gray);">Promedios de Temporada</div>
-            </div>
-
-            <div class="stats-toggle-container">
-                <button class="stats-toggle-btn active" id="btn-afavor" onclick="toggleCompStats('afavor')">A Favor</button>
-                <button class="stats-toggle-btn" id="btn-encontra" onclick="toggleCompStats('encontra')">En Contra</button>
-            </div>
-
-            <div class="stats-grid-cols">
-
-                <div class="stats-col">
-                    <h3 id="comp-home-name" class="team-title">Local</h3>
-                    <div id="comp-home-stats-afavor" class="stat-list-public"></div>
-                    <div id="comp-home-stats-encontra" class="stat-list-public hidden"></div>
-                </div>
-
-                <div class="stats-col">
-                    <h3 id="comp-away-name" class="team-title">Visitante</h3>
-                    <div id="comp-away-stats-afavor" class="stat-list-public"></div>
-                    <div id="comp-away-stats-encontra" class="stat-list-public hidden"></div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
+    <div id="public-stats-modal" class="hidden"><div class="modal-content-stats public-modal"><button onclick="closePublicStatsModal()" class="close-modal-btn">X</button><div class="modal-header"><h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2><div id="ps-match-score" class="ps-score">0 - 0</div></div><div id="ps-stats-grid" class="stats-grid-cols"><div class="stats-col"><h3 id="ps-home-name" class="team-title">Local</h3><h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4><div id="ps-home-quarters" class="stat-list-public"></div><h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4><div id="ps-home-advanced" class="stat-list-public"></div></div><div class="stats-col"><h3 id="ps-away-name" class="team-title">Visitante</h3><h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4><div id="ps-away-quarters" class="stat-list-public"></div><h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4><div id="ps-away-advanced" class="stat-list-public"></div></div></div></div></div>
+    <div id="comparison-modal" class="hidden"><div class="modal-content-stats public-modal"><button onclick="closeComparisonModal()" class="close-modal-btn">X</button><div class="modal-header"><h2 style="margin-bottom: 5px;"><i class="ri-scales-3-line"></i> Comparativa de Equipos</h2><div class="ps-score" style="font-size: 1.1rem; color: var(--cool-gray);">Promedios de Temporada</div></div><div class="stats-toggle-container"><button class="stats-toggle-btn active" id="btn-afavor" onclick="toggleCompStats('afavor')">A Favor</button><button class="stats-toggle-btn" id="btn-encontra" onclick="toggleCompStats('encontra')">En Contra</button></div><div class="stats-grid-cols"><div class="stats-col"><h3 id="comp-home-name" class="team-title">Local</h3><div id="comp-home-stats-afavor" class="stat-list-public"></div><div id="comp-home-stats-encontra" class="stat-list-public hidden"></div></div><div class="stats-col"><h3 id="comp-away-name" class="team-title">Visitante</h3><div id="comp-away-stats-afavor" class="stat-list-public"></div><div id="comp-away-stats-encontra" class="stat-list-public hidden"></div></div></div></div></div>
 
     <!-- JAVASCRIPT -->
     <script type="module" src="assets/js/federal.js"></script>
     <script src="assets/js/principal.js"></script>
-    
+
 </body>
 </html>
