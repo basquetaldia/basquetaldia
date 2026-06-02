@@ -6,7 +6,7 @@ const app = initializeApp(firebaseConfig)
 const dbFire = getFirestore(app)
 const defaultLogo = "assets/image/favicon.png"
 
-let localDB = { teams: [], matches: [] }
+let localDB = { teams: [], matches: [], phases: [] }
 
 async function initApp() {
     try {
@@ -14,10 +14,55 @@ async function initApp() {
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
             localDB = docSnap.data()
+            populatePhases()
         } 
     } catch (error) { console.error("Error conectando a la base de datos:", error) }
 }
 initApp()
+
+function populatePhases() {
+    const phaseSelect = document.getElementById('phaseSelect');
+    if(!phaseSelect) return;
+    let options = '';
+    
+    if(localDB.phases && localDB.phases.length > 0) {
+        localDB.phases.forEach(p => {
+            const phaseName = typeof p === 'string' ? p : p.name;
+            options += `<option value="${phaseName}">${phaseName}</option>`;
+        });
+    } else {
+        options = `<option value="Fase Regular">Fase Regular</option>`;
+    }
+    
+    phaseSelect.innerHTML = options;
+    window.updatePublicZoneSelect();
+}
+
+window.updatePublicZoneSelect = () => {
+    const phase = document.getElementById('phaseSelect').value;
+    const zoneSelect = document.getElementById('zoneSelect');
+    const teamFilter = document.getElementById('teamFilterSelect');
+    if(!zoneSelect) return;
+
+    // Buscar zonas donde haya equipos inscriptos para esa fase específica
+    const uniqueZones = [...new Set(localDB.teams.filter(t => t.phase === phase || (!t.phase && phase === "Fase Regular")).map(t => t.zone))];
+    
+    let options = '<option value="">Seleccionar Zona...</option>';
+    uniqueZones.sort().forEach(z => {
+        options += `<option value="${z}">${z}</option>`;
+    });
+
+    zoneSelect.innerHTML = options;
+    zoneSelect.disabled = uniqueZones.length === 0;
+
+    if(teamFilter) {
+        teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
+        teamFilter.disabled = true;
+    }
+
+    document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888; padding:30px;">Selecciona una zona para ver los partidos.</p>';
+    document.getElementById('standings-body').innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr>';
+};
 
 window.setToday = () => {
     const today = new Date(); const yyyy = today.getFullYear(); const mm = String(today.getMonth() + 1).padStart(2, '0'); const dd = String(today.getDate()).padStart(2, '0')
@@ -36,7 +81,9 @@ window.loadDailyMatches = () => {
     Object.keys(grouped).sort().forEach(zone => {
         html += `<div class="stat-card" style="margin-bottom: 25px;"><h3 class="card-header-title">📍 Zona ${zone}</h3><div style="display:flex; flex-direction:column; gap:10px;">`
         grouped[zone].forEach(m => {
-            const homeTeam = localDB.teams.find(t => t.name === m.home); const awayTeam = localDB.teams.find(t => t.name === m.away)
+            const phaseMatched = m.phase || "Fase Regular";
+            const homeTeam = localDB.teams.find(t => t.name === m.home && (t.phase === phaseMatched || !t.phase)) || localDB.teams.find(t => t.name === m.home)
+            const awayTeam = localDB.teams.find(t => t.name === m.away && (t.phase === phaseMatched || !t.phase)) || localDB.teams.find(t => t.name === m.away)
             const hLogo = homeTeam ? homeTeam.logo : defaultLogo; const aLogo = awayTeam ? awayTeam.logo : defaultLogo
             const hCode = homeTeam && homeTeam.code ? homeTeam.code : m.home.substring(0,3).toUpperCase(); const aCode = awayTeam && awayTeam.code ? awayTeam.code : m.away.substring(0,3).toUpperCase()
             const dateInfo = formatDateInfo(m.date); let actionButtons = ''; let rowClick = ''; let rowClass = 'team-premium-row'
@@ -106,7 +153,9 @@ function renderMatches(matches, allTeams) {
         const activeClass = isFirst ? 'active' : ''; const showClass = isFirst ? 'show' : ''; isFirst = false
         let matchesHtml = ''
         grouped[round].forEach(m => {
-            const homeTeam = allTeams.find(t => t.name === m.home); const awayTeam = allTeams.find(t => t.name === m.away)
+            const phaseMatched = m.phase || "Fase Regular";
+            const homeTeam = allTeams.find(t => t.name === m.home && (t.phase === phaseMatched || !t.phase)) || allTeams.find(t => t.name === m.home)
+            const awayTeam = allTeams.find(t => t.name === m.away && (t.phase === phaseMatched || !t.phase)) || allTeams.find(t => t.name === m.away)
             const hLogo = homeTeam ? homeTeam.logo : defaultLogo; const aLogo = awayTeam ? awayTeam.logo : defaultLogo
             const dateInfo = formatDateInfo(m.date); let actionButtons = ''; let rowClick = ''; let rowClass = 'team-premium-row'
 
@@ -137,11 +186,13 @@ window.toggleCompStats = (view) => {
     else { document.getElementById('btn-encontra').classList.add('active'); document.getElementById('btn-afavor').classList.remove('active'); document.getElementById('comp-home-stats-encontra').style.display = 'block'; document.getElementById('comp-away-stats-encontra').style.display = 'block'; document.getElementById('comp-home-stats-afavor').style.display = 'none'; document.getElementById('comp-away-stats-afavor').style.display = 'none' }
 }
 
-function getTeamSeasonStats(teamName) {
+function getTeamSeasonStats(teamName, phase) {
     let gamesPlayed = 0, statsGames = 0, wins = 0, losses = 0
     let totals = { pts: 0, opp_pts: 0, reb: 0, oreb: 0, ast: 0, stl: 0, tov: 0, q1: 0, q2: 0, q3: 0, q4: 0, opp_q1: 0, opp_q2: 0, opp_q3: 0, opp_q4: 0 }
     localDB.matches.forEach(m => {
         if (m.homePts === '-' || m.awayPts === '-') return
+        if (m.phase !== phase && m.phase !== undefined) return // Filtro estricto por fase
+
         let isHome = m.home === teamName; let isAway = m.away === teamName
         if (isHome || isAway) {
             gamesPlayed++; let myPts = parseInt(isHome ? m.homePts : m.awayPts) || 0; let oppPts = parseInt(isHome ? m.awayPts : m.homePts) || 0
@@ -159,9 +210,12 @@ function getTeamSeasonStats(teamName) {
 window.openComparisonModal = (matchId) => {
     const m = localDB.matches.find(x => String(x.id) === String(matchId)); if(!m) return
     window.toggleCompStats('afavor')
-    const homeTeam = localDB.teams.find(t => t.name === m.home); const awayTeam = localDB.teams.find(t => t.name === m.away)
+    const phaseMatched = m.phase || "Fase Regular";
+    const homeTeam = localDB.teams.find(t => t.name === m.home && (t.phase === phaseMatched || !t.phase)) || localDB.teams.find(t => t.name === m.home)
+    const awayTeam = localDB.teams.find(t => t.name === m.away && (t.phase === phaseMatched || !t.phase)) || localDB.teams.find(t => t.name === m.away)
+    
     const hLogo = homeTeam ? homeTeam.logo : defaultLogo; const aLogo = awayTeam ? awayTeam.logo : defaultLogo
-    const hStats = getTeamSeasonStats(m.home); const aStats = getTeamSeasonStats(m.away)
+    const hStats = getTeamSeasonStats(m.home, phaseMatched); const aStats = getTeamSeasonStats(m.away, phaseMatched)
 
     document.getElementById('comp-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${hStats.record}</span>`
     document.getElementById('comp-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord: ${aStats.record}</span>`
@@ -192,7 +246,9 @@ window.closeComparisonModal = () => { document.getElementById('comparison-modal'
 
 window.openPublicStatsModal = (matchId) => {
     const m = localDB.matches.find(x => String(x.id) === String(matchId)); if(!m) return
-    const homeTeam = localDB.teams.find(t => t.name === m.home); const awayTeam = localDB.teams.find(t => t.name === m.away)
+    const phaseMatched = m.phase || "Fase Regular";
+    const homeTeam = localDB.teams.find(t => t.name === m.home && (t.phase === phaseMatched || !t.phase)) || localDB.teams.find(t => t.name === m.home)
+    const awayTeam = localDB.teams.find(t => t.name === m.away && (t.phase === phaseMatched || !t.phase)) || localDB.teams.find(t => t.name === m.away)
     const hLogo = homeTeam ? homeTeam.logo : defaultLogo; const aLogo = awayTeam ? awayTeam.logo : defaultLogo
 
     document.getElementById('ps-match-title').innerText = `${m.home} vs ${m.away}`; document.getElementById('ps-match-score').innerText = `${m.homePts} - ${m.awayPts}`
@@ -228,7 +284,7 @@ window.closePublicStatsModal = () => { document.getElementById('public-stats-mod
 function renderStandings(teams, matches) {
     const tbody = document.getElementById('standings-body')
     tbody.innerHTML = ''
-    if (teams.length === 0) { tbody.innerHTML = '<tr><td colspan=\"9\" style="text-align:center; color:#888; padding:30px;">No hay equipos registrados.</td></tr>'; return }
+    if (teams.length === 0) { tbody.innerHTML = '<tr><td colspan=\"9\" style="text-align:center; color:#888; padding:30px;">No hay equipos registrados en esta fase.</td></tr>'; return }
 
     let standings = teams.map(t => ({ name: t.name, code: t.code, logo: t.logo, pj: 0, pg: 0, pp: 0, pf: 0, pc: 0, pts: 0, pct: 0 }))
 
