@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre Liga Metro - Basquet Al Día</title>
+    <title>Liga Metro - Basquet Al Día</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="assets/css/styles.css">
@@ -15,7 +15,6 @@
     <!-- ICONS -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
-
 </head>
 <body>
 
@@ -32,11 +31,8 @@
             <nav class="navbar">
 
                 <ul class="navbar-list">
-                    <!-- <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li> -->
-                    <!-- <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li> -->
                     <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
-                    <li><a href="premetro.html" class="navbar-link">Pre Liga Metropolitana</a></li>
-                    <!-- <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li> -->
+                    <li><a href="premetro.html" class="navbar-link">Liga Metropolitana</a></li>
                 </ul>
 
                 <div class="header-actions">
@@ -59,11 +55,11 @@
 
                     <div class="hero-content">
 
-                        <h1 class="h1 hero-title">Pre Liga Metro</h1>
+                        <h1 class="h1 hero-title">Liga Metro</h1>
 
                         <p class="form-text" style="align-content: center;">
                             <span><i class="ri-error-warning-line"></i></span>
-                            TORNEO PRE LIGA METROPOLITANA. CONSULTA TABLA Y RESULTADOS AQUÍ.
+                            TORNEO LIGA METROPOLITANA. CONSULTA TABLA Y RESULTADOS AQUÍ.
                         </p>
 
                     </div>
@@ -77,29 +73,53 @@
             <section class="filters-section">
 
                 <div class="container">
+                    
+                    <div class="view-toggle-container">
+                        <button id="btn-view-zone" class="view-toggle-btn active" onclick="toggleMainView('zone')"><i class="ri-layout-grid-fill"></i> Torneo</button>
+                        <button id="btn-view-daily" class="view-toggle-btn" onclick="toggleMainView('daily')"><i class="ri-calendar-event-fill"></i> Partidos del Día</button>
+                    </div>
 
                     <div class="filter-container" id="zone-filters">
 
                         <div class="custom-select-wrapper">
 
+                            <label for="phaseSelect">Seleccionar FASE</label>
+
+                            <select id="phaseSelect" class="custom-select" onchange="updatePublicZoneSelect()">
+                                <option value="">Cargando Fases...</option>
+                            </select>
+
+                        </div>
+
+                        <div class="custom-select-wrapper">
+
                             <label for="zoneSelect">Seleccionar ZONA</label>
 
-                            <select id="zoneSelect" class="custom-select" onchange="loadData()">
-                                <option value="">Seleccionar...</option>
-                                <option value="Norte">Norte</option>
-                                <option value="Sur 1">Sur 1</option>
-                                <option value="Sur 2">Sur 2</option>
-                                <option value="Oeste">Oeste</option>
-                                <option value="Centro 1">Centro 1</option>
-                                <option value="Centro 2 / Oeste 2">Centro 2 / Oeste 2</option>
+                            <select id="zoneSelect" class="custom-select" onchange="loadData()" disabled>
+                                <option value="">Esperando fase...</option>
                             </select>
 
                         </div>
 
                     </div>
 
+                    <div class="filter-container hidden" id="daily-filters">
+
+                        <div class="custom-select-wrapper" style="display:flex; align-items:flex-end; gap: 10px; max-width: 400px; margin: 0 auto; width: 100%;">
+
+                            <div style="flex:1;">
+                                <label for="dailyDateSelect">Fecha de los Partidos</label>
+                                <input type="date" id="dailyDateSelect" class="custom-select" style="min-width:auto;" onchange="loadDailyMatches()">
+                            </div>
+
+                            <button class="btn-hoy" onclick="setToday()">HOY</button>
+
+                        </div>
+
+                    </div>
+
                 </div>
-                
+
             </section>
 
             <section class="about" id="stats-section">
@@ -162,26 +182,39 @@
                                 </table>
 
                             </div>
-                            
+
                             <div class="standings-legend" style="margin-top: 25px; padding: 15px; background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color); font-size: 0.85rem; font-weight: 700; color: var(--cool-gray);">
                                 
                                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                    <div style="width: 14px; height: 14px; background: #0e3efc; border-radius: 4px; flex-shrink: 0;"></div>
-                                    <span>1° al 3° Puesto y dos mejores 4° generales (Clasifican a la Liga Metropolitana)</span>
+                                    <div style="width: 14px; height: 14px; background: #28a745; border-radius: 4px; flex-shrink: 0;"></div>
+                                    <span>1° al 4° Puesto (Clasifican directamente a Playoffs)</span>
                                 </div>
 
-                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                    <div style="width: 14px; height: 14px; background: #d4af37; border-radius: 4px; flex-shrink: 0;"></div>
-                                    <span>Resto de los 4° y del 5° al 9° Puesto (Juegan la Copa de Oro)</span>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                                    <div style="width: 14px; height: 14px; background: #8fd19e; border-radius: 4px; flex-shrink: 0;"></div>
+                                    <span>5° al 12° Puesto (Clasifican a un Play-In a partido único: 5°vs12°, 6°vs11°, 7°vs10° y 8°vs9°)</span>
                                 </div>
 
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 14px; height: 14px; background: #a8b3bd; border-radius: 4px; flex-shrink: 0;"></div>
-                                    <span>10° Puesto en adelante (Juegan la Copa de Plata)</span>
+                                <div style="display: flex; align-items: flex-start; gap: 10px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+
+                                    <i class="ri-trophy-line" style="color: #f39c12; font-size: 1.2rem; flex-shrink: 0;"></i>
+
+                                    <span style="font-weight: 600; line-height: 1.4;">
+                                        <strong>Súper 4:</strong> Dentro de la primera vuelta (ida, 11 partidos), los primeros de cada grupo juegan el Súper 4, en donde el primero de la Centro-Norte B va contra la Sur-Oeste D, y el ganador de la Centro-Norte A contra la Sur-Oeste C.
+                                    </span>
+
                                 </div>
 
                             </div>
 
+                        </div>
+
+                    </div>
+
+                    <div id="view-daily-content" class="hidden">
+
+                        <div id="daily-matches-container">
+                            <p style="text-align:center; color:#888; padding: 30px;">Selecciona una fecha.</p>
                         </div>
 
                     </div>
@@ -202,20 +235,11 @@
 
                 <div class="footer-brand">
 
-                    <a href="#" class="logo">
-                        <img src="assets/image/favicon.png" width="100px">
-                    </a>
-
+                    <a href="#" class="logo"><img src="assets/image/favicon.png" width="100px"></a>
                     <p class="footer-text">Seguinos en nuestras redes!</p>
 
                     <ul class="social-list">
-
-                        <li>
-                            <a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank">
-                                <i class="ri-links-line"></i>
-                            </a>
-                        </li>
-
+                        <li><a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank"><i class="ri-links-line"></i></a></li>
                     </ul>
 
                 </div>
@@ -224,11 +248,8 @@
 
                     <ul class="footer-list">
                         <li><p class="footer-item-title">Competencias</p></li>
-                        <!-- <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li> -->
-                        <!-- <li><a href="ligaargentina.html" class="footer-link">Liga Argentina</a></li> -->
                         <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
-                        <li><a href="premetro.html" class="footer-link">Pre Liga Metropolitana</a></li>
-                        <!-- <li><a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a></li> -->
+                        <li><a href="premetro.html" class="footer-link">Liga Metropolitana</a></li>
                     </ul>
 
                 </div>
@@ -238,25 +259,88 @@
         </div>
 
         <div class="footer-botton">
+            <div class="container"><center><p class="copyright">Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.</p></center></div>
+        </div>
 
-            <div class="container">
+    </footer>
 
-                <center>
-                    <p class="copyright">
-                        Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.
-                    </p>
-                </center>
+    <div id="public-stats-modal" class="hidden">
+
+        <div class="modal-content-stats public-modal">
+
+            <button onclick="closePublicStatsModal()" class="close-modal-btn">X</button>
+
+            <div class="modal-header">
+                <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
+                <div id="ps-match-score" class="ps-score">0 - 0</div>
+                <div style="font-size: 0.9rem; color: var(--cool-gray); margin-top: 5px;">Estadísticas de este partido</div>
+            </div>
+
+            <div id="ps-stats-grid" class="stats-grid-cols">
+
+                <div class="stats-col">
+                    <h3 id="ps-home-name" class="team-title">Local</h3>
+                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
+                    <div id="ps-home-quarters" class="stat-list-public"></div>
+                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
+                    <div id="ps-home-advanced" class="stat-list-public"></div>
+                </div>
+
+                <div class="stats-col">
+                    <h3 id="ps-away-name" class="team-title">Visitante</h3>
+                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
+                    <div id="ps-away-quarters" class="stat-list-public"></div>
+                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
+                    <div id="ps-away-advanced" class="stat-list-public"></div>
+                </div>
 
             </div>
 
         </div>
 
-    </footer>
+    </div>
+
+    <div id="comparison-modal" class="hidden">
+
+        <div class="modal-content-stats public-modal">
+
+            <button onclick="closeComparisonModal()" class="close-modal-btn">X</button>
+
+            <div class="modal-header">
+                <h2 style="margin-bottom: 5px;"><i class="ri-scales-3-line"></i> Comparativa de Equipos</h2>
+                <div class="ps-score" style="font-size: 1.1rem; color: var(--cool-gray);">Promedios de la Fase Regular</div>
+            </div>
+
+            <div class="stats-toggle-container">
+                <button class="stats-toggle-btn active" id="btn-afavor" onclick="toggleCompStats('afavor')">A Favor</button>
+                <button class="stats-toggle-btn" id="btn-encontra" onclick="toggleCompStats('encontra')">En Contra</button>
+            </div>
+
+            <div class="stats-grid-cols">
+
+                <div class="stats-col">
+                    <h3 id="comp-home-name" class="team-title">Local</h3>
+                    <div id="comp-home-stats-afavor" class="stat-list-public"></div>
+                    <div id="comp-home-stats-encontra" class="stat-list-public hidden"></div>
+                </div>
+
+                <div class="stats-col">
+                    <h3 id="comp-away-name" class="team-title">Visitante</h3>
+                    <div id="comp-away-stats-afavor" class="stat-list-public"></div>
+                    <div id="comp-away-stats-encontra" class="stat-list-public hidden"></div>
+                </div>
+
+            </div>
+
+            <div id="h2h-container"></div>
+            
+        </div>
+        
+    </div>
 
     <!-- JAVASCRIPT -->
     <script type="module" src="assets/js/premetro.js"></script>
     <script src="assets/js/principal.js"></script>
-    <script src="assets/js/darkmode.js"></script>
     
 </body>
 </html>
