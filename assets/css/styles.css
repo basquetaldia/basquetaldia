@@ -786,6 +786,8 @@ th { white-space: nowrap; }
 .table-container { overflow-x: auto; }
 .table-container::-webkit-scrollbar { height: 10px; }
 
+
+
 /* Zonas de Clasificación - Liga Nacional */
 
 /* 1 al 4: Playoffs Directos (Verde) */
@@ -839,3 +841,4 @@ th { white-space: nowrap; }
 .dot-playin { background-color: #8fd19e; }
 
 .dot-playout { background-color: #dc3545; }
+
