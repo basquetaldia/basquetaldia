@@ -32,6 +32,9 @@ async function initApp() {
 }
 initApp()
 
+// ----------------------------------------------------
+// FASES DINÁMICAS (Página Usuario)
+// ----------------------------------------------------
 function populatePhases() {
     const phaseSelect = document.getElementById('phaseSelect');
     if(!phaseSelect) return;
@@ -99,7 +102,7 @@ window.updatePublicZoneSelect = () => {
     }
 
     document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888; padding:30px;">Selecciona una zona para ver los partidos.</p>';
-    document.getElementById('standings-body').innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr>';
+    document.getElementById('standings-body').innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr>';
 };
 
 window.loadData = () => {
@@ -136,6 +139,9 @@ window.filterMatchesByTeam = () => {
     renderMatches(filteredMatches, localDB.teams)
 }
 
+// ----------------------------------------------------
+// MOTOR DE RÉCORDS
+// ----------------------------------------------------
 function getTeamRecord(teamName, phase) {
     let wins = 0; let losses = 0;
     localDB.matches.forEach(m => {
@@ -152,6 +158,9 @@ function getTeamRecord(teamName, phase) {
     return `${wins}-${losses}`;
 }
 
+// ----------------------------------------------------
+// DISEÑO: PARTIDOS DEL DÍA
+// ----------------------------------------------------
 window.loadDailyMatches = () => {
     const dateVal = document.getElementById('dailyDateSelect').value
     const container = document.getElementById('daily-matches-container')
@@ -248,6 +257,9 @@ window.loadDailyMatches = () => {
     container.innerHTML = html
 }
 
+// ----------------------------------------------------
+// DISEÑO: TORNEO / RENDER DE PARTIDOS
+// ----------------------------------------------------
 function renderMatches(matches, allTeams) {
     const container = document.getElementById('matches-container')
     container.innerHTML = ''
@@ -358,6 +370,9 @@ function renderMatches(matches, allTeams) {
     })
 }
 
+// ----------------------------------------------------
+// MODALES Y ESTADÍSTICAS
+// ----------------------------------------------------
 window.toggleCompStats = (view) => {
     if(view === 'afavor') {
         document.getElementById('btn-afavor').classList.add('active'); document.getElementById('btn-encontra').classList.remove('active')
@@ -382,7 +397,7 @@ function getTeamSeasonStats(teamName) {
     localDB.matches.forEach(m => {
         if (m.homePts === '-' || m.awayPts === '-') return
         const matchPhase = m.phase || "Fase Regular";
-
+        
         if (matchPhase !== "Fase Regular") return; 
 
         let isHome = m.home === teamName
@@ -486,7 +501,8 @@ window.openComparisonModal = (matchId) => {
 
     document.getElementById('comp-home-stats-afavor').innerHTML = hAFavor; document.getElementById('comp-away-stats-afavor').innerHTML = aAFavor
     document.getElementById('comp-home-stats-encontra').innerHTML = hEnContra; document.getElementById('comp-away-stats-encontra').innerHTML = aEnContra
-
+    
+    // HISTORIAL DE ENFRENTAMIENTOS DIRECTOS (H2H)
     const h2hMatches = localDB.matches.filter(match => 
         ((match.home === m.home && match.away === m.away) || (match.home === m.away && match.away === m.home)) &&
         match.homePts !== '-' && match.awayPts !== '-'
@@ -591,14 +607,24 @@ window.openPublicStatsModal = (matchId) => {
 
 window.closePublicStatsModal = () => { document.getElementById('public-stats-modal').classList.add('hidden')}
 
+// ---------------------------------------------------------
+// MOTOR DE CÁLCULO DE POSICIONES Y RACHA
+// ---------------------------------------------------------
 function calculateStandings(teams, matches) {
-
     let standings = teams.map(t => ({
         name: t.name, code: t.code, logo: t.logo,
-        pj: 0, pg: 0, pp: 0, pf: 0, pc: 0, pts: 0, pct: 0
+        pj: 0, pg: 0, pp: 0, pf: 0, pc: 0, pts: 0, pct: 0,
+        form: [] // Racha
     }))
 
-    matches.forEach(m => {
+    // Ordenamos cronológicamente para que la racha se guarde en orden real
+    const sortedMatches = [...matches].sort((a, b) => {
+        const dateA = new Date((a.date || '1970-01-01') + 'T' + (a.time || '00:00'));
+        const dateB = new Date((b.date || '1970-01-01') + 'T' + (b.time || '00:00'));
+        return dateA - dateB;
+    });
+
+    sortedMatches.forEach(m => {
         if (m.homePts === "-" || m.awayPts === "-") return
         const hPts = parseInt(m.homePts), aPts = parseInt(m.awayPts)
 
@@ -613,10 +639,14 @@ function calculateStandings(teams, matches) {
 
                 if (hPts > aPts) { 
                     standings[hIdx].pg++; standings[hIdx].pts += 2
+                    standings[hIdx].form.push('G');
                     standings[aIdx].pp++; standings[aIdx].pts += 1
+                    standings[aIdx].form.push('P');
                 } else if (aPts > hPts) { 
                     standings[aIdx].pg++; standings[aIdx].pts += 2
+                    standings[aIdx].form.push('G');
                     standings[hIdx].pp++; standings[hIdx].pts += 1
+                    standings[hIdx].form.push('P');
                 } else { 
                     standings[hIdx].pts += 1; standings[aIdx].pts += 1
                 }
@@ -638,12 +668,15 @@ function calculateStandings(teams, matches) {
     return standings;
 }
 
+// ---------------------------------------------------------
+// DIBUJA LA TABLA DE POSICIONES
+// ---------------------------------------------------------
 function renderStandings(teams, matches) {
     const tbody = document.getElementById('standings-body')
     tbody.innerHTML = ''
     
     if (teams.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan=\"8\" style="text-align:center; color:#888; padding:30px;">No hay equipos registrados.</td></tr>'
+        tbody.innerHTML = '<tr><td colspan=\"9\" style="text-align:center; color:#888; padding:30px;">No hay equipos registrados.</td></tr>'
         return
     }
 
@@ -659,15 +692,31 @@ function renderStandings(teams, matches) {
         
         const codeName = t.code ? t.code : t.name.substring(0,3).toUpperCase()
 
+        // Lógica de Colores Clasificatorios
         let posColorBg = '#f1f5f9';
         let posColorText = 'var(--black)';
         let posBorder = '#cbd5e1';
 
         if (i < 4) {
+            // 1° al 4° Puesto
             posColorBg = '#28a745'; posColorText = '#fff'; posBorder = '#28a745';
         } else if (i >= 4 && i < 12) {
+            // 5° al 12° Puesto
             posColorBg = '#8fd19e'; posColorText = '#fff'; posBorder = '#8fd19e';
         }
+
+        // HTML de la Racha (Últimos 5)
+        const last5 = t.form.slice(-5);
+        let rachaHtml = '<div class="racha-box">';
+        if (last5.length === 0) {
+            rachaHtml += '<span style="color:#888; font-size:0.8rem;">-</span>';
+        } else {
+            last5.forEach(res => {
+                const badgeClass = res === 'G' ? 'r-win' : 'r-loss';
+                rachaHtml += `<span class="r-badge ${badgeClass}">${res}</span>`;
+            });
+        }
+        rachaHtml += '</div>';
 
         const teamLink = `equipo.html?liga=liga_metropolitana&equipo=${encodeURIComponent(t.name)}`;
 
@@ -687,6 +736,7 @@ function renderStandings(teams, matches) {
                 <td class=\"col-pf\">${t.pf}</td>
                 <td class=\"col-pc\">${t.pc}</td>
                 <td class=\"col-dg ${dgClass}\">${dgText}</td>
+                <td>${rachaHtml}</td>
             </tr>`
 
         tbody.innerHTML += row
