@@ -12,278 +12,224 @@
     <!-- FAVICON -->
     <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
 
-    <!-- ICONS -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
-    
-    <!-- Ícono para la pantalla de inicio en iOS -->
-    <link rel="apple-touch-icon" href="assets/image/favicon.png">
-
-    <!-- Hace que la web funcione como una App Nativa (Oculta la barra de Safari) -->
+    <!-- ETIQUETAS PARA IOS (WEB APP NATIVA) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Básquet">
-    
+    <link rel="apple-touch-icon" href="assets/image/favicon.png">
+
+    <!-- ICONS -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
 
     <header class="header" id="header" data-header>
-        
         <div class="container">
-            
             <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
-            
             <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn>
                 <i class="ri-menu-line"></i>
             </button>
-            
             <nav class="navbar">
-                
                 <ul class="navbar-list">
-                    <li><a href="./liganacional.html" class="navbar-link">Liga Nacional</a></li>
-                    <li><a href="./ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
-                    <li><a href="./ligafederal.html" class="navbar-link">Liga Federal 2026</a></li>
-                    <li><a href="./premetro.html" class="navbar-link">Liga Metropolitana</a></li>
+                    <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li>
+                    <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
+                    <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
+                    <li><a href="premetro.html" class="navbar-link">Liga Metropolitana</a></li>
                 </ul>
-                
                 <div class="header-actions">
                     <a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a>
                 </div>
-                
             </nav>
-            
         </div>
-        
     </header>
 
     <main>
-        
         <article>
-            
             <section class="hero" id="hero">
-                
                 <div class="container">
-                    
                     <div class="hero-content">
-                        
-                        <h1 class="h1 hero-title">Liga Metropolitana</h1>
-                        
+                        <h1 class="h1 hero-title">Liga Metro</h1>
                         <p class="form-text" style="align-content: center;">
                             <span><i class="ri-error-warning-line"></i></span>
                             TORNEO LIGA METROPOLITANA. CONSULTA TABLA Y RESULTADOS AQUÍ.
                         </p>
-                        
                     </div>
-                    
                     <figure class="hero-banner"><img src="assets/image/ligametro.png"></figure>
-                    
                 </div>
-                
             </section>
 
             <section class="filters-section">
-                
                 <div class="container">
                     
                     <div class="view-toggle-container">
                         <button id="btn-view-zone" class="view-toggle-btn active" onclick="toggleMainView('zone')"><i class="ri-layout-grid-fill"></i> Torneo</button>
                         <button id="btn-view-daily" class="view-toggle-btn" onclick="toggleMainView('daily')"><i class="ri-calendar-event-fill"></i> Partidos del Día</button>
+                        <button id="btn-view-calendar" class="view-toggle-btn" onclick="toggleMainView('calendar')"><i class="ri-calendar-line"></i> Calendario</button>
                     </div>
 
-                    <div class="filter-container" id="zone-filters">
-                        
+                    <!-- Filtros Visibles tanto en Torneo como en Calendario -->
+                    <div class="filter-container" id="zone-filters" style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;">
                         <div class="custom-select-wrapper">
-                            
                             <label for="phaseSelect">Seleccionar FASE</label>
-                            
                             <select id="phaseSelect" class="custom-select" onchange="updatePublicZoneSelect()">
                                 <option value="">Cargando Fases...</option>
                             </select>
-                            
                         </div>
-
                         <div class="custom-select-wrapper">
-                            
                             <label for="zoneSelect">Seleccionar ZONA</label>
-                            
-                            <select id="zoneSelect" class="custom-select" onchange="loadData()" disabled>
-                                <option value="">Esperando fase...</option>
+                            <select id="zoneSelect" class="custom-select" onchange="loadData()">
+                                <option value="">Todas las Zonas</option>
                             </select>
-                            
                         </div>
-                        
+                        <div class="custom-select-wrapper">
+                            <label for="teamFilterSelect">Filtrar EQUIPO</label>
+                            <select id="teamFilterSelect" class="custom-select" onchange="filterMatchesByTeam()">
+                                <option value="">Todos los equipos</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="filter-container hidden" id="daily-filters">
-                        
                         <div class="custom-select-wrapper" style="display:flex; align-items:flex-end; gap: 10px; max-width: 400px; margin: 0 auto; width: 100%;">
-                            
                             <div style="flex:1;">
                                 <label for="dailyDateSelect">Fecha de los Partidos</label>
                                 <input type="date" id="dailyDateSelect" class="custom-select" style="min-width:auto;" onchange="loadDailyMatches()">
                             </div>
-                            
                             <button class="btn-hoy" onclick="setToday()">HOY</button>
-                            
                         </div>
-                        
                     </div>
 
                 </div>
-                
             </section>
 
             <section class="about" id="stats-section">
-                
                 <div class="container">
 
                     <div id="view-zone-content" class="stats-grid">
                         
                         <div class="stat-card">
-                            
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                
                                 <h3 class="card-header-title" style="margin:0;">Partidos</h3>
-                                
-                                <div class="custom-select-wrapper">
-                                    
-                                    <select id="teamFilterSelect" class="custom-select filter-mini" onchange="filterMatchesByTeam()" disabled>
-                                        <option value="">Todos los equipos</option>
-                                    </select>
-                                    
-                                </div>
-                                
                             </div>
 
                             <div id="matches-container">
-                                <p style="text-align:center; color:#888; padding: 30px;">Selecciona una zona para ver los partidos.</p>
+                                <p style="text-align:center; color:#888; padding: 30px;">Cargando partidos...</p>
                             </div>
-                            
                         </div>
 
                         <div class="stat-card">
-                            
+                            <h3 class="card-header-title" style="margin-bottom: 20px; font-size: 1rem;"><i class="ri-bar-chart-grouped-line"></i> Líderes Estadísticos</h3>
+                            <div id="tournament-leaders" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                                <p style="text-align:center; color:#888; width: 100%; grid-column: 1 / -1;">Calculando líderes...</p>
+                            </div>
+
                             <h3 class="card-header-title">Posiciones</h3>
-                            
                             <div class="table-responsive">
-                                
                                 <table>
-                                    
                                     <thead>
-                                        
                                         <tr>
                                             <th>Pos</th>
                                             <th class="t-left">Equipo</th>
                                             <th class="col-pj" title="Partidos Jugados">PJ</th>
                                             <th class="col-pg" title="Ganados">PG</th>
                                             <th class="col-pp" title="Perdidos">PP</th>
+                                            <th class="col-pct" title="Porcentaje">%</th>
                                             <th class="col-pf" title="Goles a Favor">GF</th>
                                             <th class="col-pc" title="Goles en Contra">GC</th>
                                             <th class="col-dg" title="Diferencia de Gol">DG</th>
                                             <th title="Últimos 5 partidos">Racha</th>
                                         </tr>
-                                        
                                     </thead>
-                                    
                                     <tbody id="standings-body">
-                                        
                                         <tr>
-                                            <td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td>
+                                            <td colspan="10" style="text-align:center; color:#888; padding:30px;">Cargando tabla...</td>
                                         </tr>
-                                        
                                     </tbody>
-                                    
                                 </table>
-                                
                             </div>
 
+                            <!-- LEYENDA CLASIFICATORIA -->
                             <div class="standings-legend" style="margin-top: 25px; padding: 15px; background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color); font-size: 0.85rem; font-weight: 700; color: var(--cool-gray);">
-                                
                                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                                     <div style="width: 14px; height: 14px; background: #28a745; border-radius: 4px; flex-shrink: 0;"></div>
                                     <span>1° al 4° Puesto (Clasifican directamente a Playoffs)</span>
                                 </div>
-                                
                                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                                     <div style="width: 14px; height: 14px; background: #8fd19e; border-radius: 4px; flex-shrink: 0;"></div>
-                                    <span>5° al 12° Puesto (Clasifican a un Play-In a partido único: 5°vs12°, 6°vs11°, 7°vs10° y 8°vs9°)</span>
+                                    <span>5° al 12° Puesto (Clasifican a un Play-In a partido único)</span>
                                 </div>
-                                
+                                <div style="display: flex; align-items: flex-start; gap: 10px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                                    <i class="ri-trophy-line" style="color: #f39c12; font-size: 1.2rem; flex-shrink: 0;"></i>
+                                    <span style="font-weight: 600; line-height: 1.4;">
+                                        <strong>Súper 4:</strong> Dentro de la primera vuelta (ida, 11 partidos), los primeros de cada grupo juegan el Súper 4.
+                                    </span>
+                                </div>
                             </div>
 
                         </div>
 
                     </div>
 
-
+                    <!-- VISTA PARTIDOS DEL DIA -->
                     <div id="view-daily-content" class="hidden">
-                        
                         <div id="daily-matches-container">
                             <p style="text-align:center; color:#888; padding: 30px;">Selecciona una fecha.</p>
                         </div>
-                        
+                    </div>
+
+                    <!-- VISTA CALENDARIO MENSUAL -->
+                    <div id="view-calendar-content" class="hidden">
+                        <div class="stat-card" style="width: 100%;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; background:var(--bg-base); padding:10px; border-radius:12px; border:1px solid var(--border-color);">
+                                <button class="btn-hoy" style="padding:10px 15px; background:var(--card-bg); color:var(--cool-gray); border:1px solid var(--border-color);" onclick="changeMonth(-1)"><i class="ri-arrow-left-s-line" style="font-size: 1.2rem;"></i></button>
+                                <h3 id="calendar-month-year" style="margin:0; text-align:center; font-family:'Mulish', sans-serif; font-weight:900; color:var(--accent-color); font-size:1.3rem; text-transform:uppercase;">Mes Año</h3>
+                                <button class="btn-hoy" style="padding:10px 15px; background:var(--card-bg); color:var(--cool-gray); border:1px solid var(--border-color);" onclick="changeMonth(1)"><i class="ri-arrow-right-s-line" style="font-size: 1.2rem;"></i></button>
+                            </div>
+                            <div id="calendar-grid" class="calendar-grid"></div>
+                        </div>
                     </div>
 
                 </div>
-                
             </section>
-            
         </article>
-        
     </main>
 
     <footer>
-        
         <div class="footer-top">
-            
             <div class="container">
-                
                 <div class="footer-brand">
-                    
                     <a href="#" class="logo"><img src="assets/image/favicon.png" width="100px"></a>
                     <p class="footer-text">Seguinos en nuestras redes!</p>
-                    
                     <ul class="social-list">
                         <li><a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank"><i class="ri-links-line"></i></a></li>
                     </ul>
-                    
                 </div>
-                
                 <div class="footer-link-box">
-                    
                     <ul class="footer-list">
                         <li><p class="footer-item-title">Competencias</p></li>
                         <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li>
-                        <li><a href="ligafederal.html" class="footer-link">Liga Federal 2026</a></li>
+                        <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
                         <li><a href="premetro.html" class="footer-link">Liga Metropolitana</a></li>
                     </ul>
-                    
                 </div>
-                
             </div>
-            
         </div>
-        
         <div class="footer-botton">
             <div class="container"><center><p class="copyright">Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.</p></center></div>
         </div>
-        
     </footer>
 
+    <!-- MODAL ESTADÍSTICAS DEL PARTIDO -->
     <div id="public-stats-modal" class="hidden">
-        
         <div class="modal-content-stats public-modal">
-            
             <button onclick="closePublicStatsModal()" class="close-modal-btn">X</button>
-            
             <div class="modal-header">
                 <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
                 <div id="ps-match-score" class="ps-score">0 - 0</div>
                 <div style="font-size: 0.9rem; color: var(--cool-gray); margin-top: 5px;">Estadísticas de este partido</div>
             </div>
-            
             <div id="ps-stats-grid" class="stats-grid-cols">
-                
                 <div class="stats-col">
                     <h3 id="ps-home-name" class="team-title">Local</h3>
                     <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
@@ -291,7 +237,6 @@
                     <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
                     <div id="ps-home-advanced" class="stat-list-public"></div>
                 </div>
-                
                 <div class="stats-col">
                     <h3 id="ps-away-name" class="team-title">Visitante</h3>
                     <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
@@ -299,59 +244,143 @@
                     <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
                     <div id="ps-away-advanced" class="stat-list-public"></div>
                 </div>
-                
             </div>
-            
         </div>
-        
     </div>
 
+    <!-- MODAL PREVIEW / COMPARATIVA -->
     <div id="comparison-modal" class="hidden">
-        
         <div class="modal-content-stats public-modal">
-            
             <button onclick="closeComparisonModal()" class="close-modal-btn">X</button>
-            
             <div class="modal-header">
                 <h2 style="margin-bottom: 5px;"><i class="ri-scales-3-line"></i> Comparativa de Equipos</h2>
                 <div class="ps-score" style="font-size: 1.1rem; color: var(--cool-gray);">Promedios de la Fase Regular</div>
             </div>
-            
             <div class="stats-toggle-container">
                 <button class="stats-toggle-btn active" id="btn-afavor" onclick="toggleCompStats('afavor')">A Favor</button>
                 <button class="stats-toggle-btn" id="btn-encontra" onclick="toggleCompStats('encontra')">En Contra</button>
             </div>
-            
             <div class="stats-grid-cols">
-                
                 <div class="stats-col">
                     <h3 id="comp-home-name" class="team-title">Local</h3>
                     <div id="comp-home-stats-afavor" class="stat-list-public"></div>
                     <div id="comp-home-stats-encontra" class="stat-list-public hidden"></div>
                 </div>
-                
                 <div class="stats-col">
                     <h3 id="comp-away-name" class="team-title">Visitante</h3>
                     <div id="comp-away-stats-afavor" class="stat-list-public"></div>
                     <div id="comp-away-stats-encontra" class="stat-list-public hidden"></div>
                 </div>
-                
             </div>
             
+            <!-- HISTORIAL DE ENFRENTAMIENTOS -->
             <div id="h2h-container"></div>
             
         </div>
-        
     </div>
 
+    <!-- CSS ADICIONAL -->
     <style>
         .racha-box { display: flex; gap: 4px; justify-content: center; align-items: center; }
         .r-badge { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: white; }
         .r-win { background-color: var(--green); }
         .r-loss { background-color: var(--red); }
+        
+        .leader-card { background: var(--bg-base, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
+        .leader-card:hover { transform: translateY(-3px); border-color: var(--accent-color, #0050B8); }
+        .leader-icon-box { width: 45px; height: 45px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex-shrink: 0; padding: 5px; }
+        .leader-icon-box img { width: 100%; height: 100%; object-fit: contain; }
+        .leader-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .leader-lbl { font-size: 0.75rem; color: var(--cool-gray, #64748b); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
+        .leader-name { font-weight: 900; font-size: 0.95rem; color: var(--text-main, #0f172a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .leader-val { font-size: 1.4rem; font-weight: 900; color: var(--accent-color, #0050B8); margin-left: auto; font-family: 'Mulish', sans-serif;}
+        .leader-val.defense { color: var(--green, #10b981); }
+
+        /* ACORDEONES POR DÍA (JORNADAS) */
+        .day-accordion { margin-bottom: 12px; }
+        .day-accordion summary {
+            background: #f8fafc; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 0.85rem; color: var(--accent-color);
+            cursor: pointer; list-style: none; display: flex; align-items: center; border: 1px dashed var(--border-color); text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        .day-accordion summary:hover { background: #f1f5f9; }
+        .day-accordion summary::-webkit-details-marker { display: none; }
+        .day-accordion-content { padding-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+
+        /* CALENDARIO ESTILOS */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; width: 100%; }
+        .calendar-day-header { font-weight: 900; text-align: center; color: var(--cool-gray); padding-bottom: 10px; border-bottom: 2px dashed var(--border-color); text-transform: uppercase; font-size: 0.85rem;}
+        
+        .calendar-day { min-height: 120px; background: var(--bg-base, #f8fafc); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+        .calendar-day.empty { background: transparent; border: none; pointer-events: none; } 
+        .calendar-date { font-weight: 900; font-size: 1rem; color: var(--cool-gray); text-align: right; margin-bottom: 2px; font-family: 'Mulish', sans-serif;}
+        .mobile-day-name { display: none; }
+        
+        .calendar-event { 
+            background: var(--card-bg, #fff); border: 1px solid var(--border-color); border-radius: 6px; 
+            padding: 6px 4px; display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
+            overflow: hidden; width: 100%; transition: all 0.2s;
+        }
+        .calendar-event:hover { border-color: var(--accent-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,80,184,0.15);}
+        .cal-ev-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed var(--border-color); }
+        .cal-ev-time { font-size: 0.7rem; font-weight: 900; color: var(--cool-gray); white-space: nowrap; display: flex; align-items: center; gap: 3px; }
+        .cal-ev-match { display: flex; justify-content: center; align-items: center; width: 100%; flex-wrap: nowrap; gap: 2px; }
+        .cal-ev-team { display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0; }
+        .cal-ev-team.home { justify-content: flex-end; }
+        .cal-ev-team.away { justify-content: flex-start; }
+        .cal-ev-code { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+        .cal-team-logo { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
+        .cal-channel-logo { width: 30px; height: 30px; object-fit: contain; border-radius: 4px; background: white; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;}
+        .cal-ev-res-box { display: flex; align-items: center; background: var(--bg-base); padding: 1px 4px; border-radius: 4px; margin: 0 1px; flex-shrink: 0; white-space: nowrap; border: 1px solid var(--border-color); }
+        .cal-ev-res-pts { font-size: 0.75rem; }
+        .cal-ev-res-sep { margin: 0 2px; color: var(--cool-gray); font-size: 0.65rem; font-weight: 800; }
+        .cal-ev-vs { font-size: 0.6rem; font-weight: 900; color: var(--cool-gray); background: #f1f5f9; padding: 1px 4px; border-radius: 4px; margin: 0 1px; flex-shrink: 0; }
+        
+        .calendar-events-container { display: flex; flex-direction: column; gap: 4px; }
+
+        @media (max-width: 768px) {
+            .table-responsive { overflow-x: hidden; width: 100%; }
+            .table-responsive table { font-size: 0.85rem; width: 100%; min-width: 100%; }
+            .table-responsive th, .table-responsive td { padding: 4px 2px; font-size: 0.85rem !important; }
+            .t-name-full, .t-name-code { display: none !important; }
+            .t-logo { width: 22px; height: 22px; margin: 0 auto; display: block; }
+            .col-racha { display: none; }
+            .cell-pos-box { width: 20px; height: 20px; font-size: 0.75rem; margin: 0 auto; }
+
+            .calendar-grid { grid-template-columns: 1fr; gap: 0; grid-auto-rows: auto; }
+            .calendar-day-header { display: none; }
+            .calendar-day { display: flex; flex-direction: column; align-items: stretch; padding: 15px 10px; border-bottom: 1px solid var(--border-color); border-radius: 0; border-top: none; border-left: none; border-right: none; min-height: unset; }
+            .calendar-day.empty { display: none; }
+            .calendar-date { text-align: left; margin-bottom: 12px; font-size: 1.5rem; color: var(--accent-color); display: flex; align-items: center; }
+            .mobile-day-name { display: inline-block; font-weight: 900; color: var(--cool-gray); margin-right: 8px; }
+            .calendar-events-container { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+            .calendar-event { width: 100%; padding: 12px; margin-bottom: 0; border-radius: 8px;}
+            
+            .cal-ev-top { margin-bottom: 12px; padding-bottom: 8px; }
+            .cal-ev-time { font-size: 1rem; gap: 5px; }
+            .cal-team-logo { width: 32px; height: 32px; }
+            .cal-channel-logo { width: 38px; height: 38px; }
+            .cal-ev-code { font-size: 1.15rem; }
+            .cal-ev-res-pts { font-size: 1.3rem; }
+            .cal-ev-res-sep { font-size: 1rem; margin: 0 5px; }
+            .cal-ev-vs { font-size: 1rem; padding: 4px 8px; }
+            .cal-ev-res-box { padding: 4px 10px; border-radius: 8px; }
+            .cal-ev-match { gap: 8px; }
+            .cal-ev-team { gap: 8px; }
+        }
+
+        body.dark-mode .calendar-day { background: #0f172a; border-color: #334155; }
+        body.dark-mode .calendar-event { background: #1e293b; border-color: #334155; }
+        body.dark-mode .cal-channel-logo { border-color: #334155; }
+        body.dark-mode .calendar-day-header { border-color: #334155; color: #94a3b8;}
+        body.dark-mode .day-accordion summary { background: #1e293b; border-color: #334155; }
+        body.dark-mode .day-accordion summary:hover { background: #0f172a; }
+        body.dark-mode .cal-ev-res-box { background: #0f172a; border-color: #334155;}
+        body.dark-mode .cal-ev-vs { background: #0f172a; }
+        body.dark-mode .leader-card { background: #0f172a; border-color: #334155; }
+        body.dark-mode .leader-icon-box { background: #1e293b; }
     </style>
 
-    <!-- JAVASCRIPT -->
     <script type="module" src="assets/js/premetro.js"></script>
     <script src="assets/js/principal.js"></script>
     
