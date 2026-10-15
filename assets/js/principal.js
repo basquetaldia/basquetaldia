@@ -7,20 +7,16 @@ navToggleBtn.addEventListener('click', () =>
 })
 
 
+
 if (("standalone" in window.navigator) && window.navigator.standalone) {
+    
     document.addEventListener('click', function(event) {
         const a = event.target.closest('a');
         
         
         if (a && a.href && a.target !== '_blank' && a.host === window.location.host) {
             event.preventDefault(); 
-            
-            
-            const rutaRelativa = a.getAttribute('href');
-            
-            if (rutaRelativa) {
-                window.location.replace(rutaRelativa); 
-            }
+            window.location.href = a.href; 
         }
-    }, false);
+    }, true); 
 }
