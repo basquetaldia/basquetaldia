@@ -77,7 +77,7 @@ window.toggleMainView = (view) => {
         else window.loadDailyMatches()
     } else if (view === 'calendar') {
         btnCalendar.classList.add('active'); 
-        zoneFilters.classList.remove('hidden'); // Mantiene activos los filtros Fase/Zona/Equipo en el Calendario
+        zoneFilters.classList.remove('hidden'); 
         calendarContent.classList.remove('hidden');
         window.renderCalendar();
     }
@@ -97,8 +97,9 @@ window.updatePublicZoneSelect = () => {
 
     const uniqueZones = [...new Set(localDB.teams.filter(t => t.phase === phase || (!t.phase && phase === "Fase Regular")).map(t => t.zone))];
     
-    // Opción agregada para mostrar "Todas las Zonas" por defecto
-    let options = '<option value="">Todas las Zonas</option>';
+    let options = '<option value="">Seleccionar Zona...</option>';
+    options += '<option value="all">Todas las Zonas</option>'; // Opción Mega Tabla
+    
     uniqueZones.sort().forEach(z => {
         if(z) options += `<option value="${z}">${z}</option>`;
     });
@@ -120,36 +121,54 @@ window.loadData = () => {
     const teamFilter = document.getElementById('teamFilterSelect');
     const selectedTeam = teamFilter ? teamFilter.value : "";
     
+    // Si no ha seleccionado ninguna opción válida inicial
+    if (!zoneCode) {
+        document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888; padding:30px;">Selecciona una zona para ver los partidos.</p>';
+        document.getElementById('standings-body').innerHTML = '<tr><td colspan="10" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr>';
+        return;
+    }
+
     let baseTeams = localDB.teams.filter(t => (!t.phase || t.phase === phase));
-    if (zoneCode) {
-        baseTeams = baseTeams.filter(t => t.zone === zoneCode);
-    }
-
-    if (teamFilter) {
-        teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
-        baseTeams.sort((a,b) => a.name.localeCompare(b.name)).forEach(t => {
-            const opt = document.createElement('option'); opt.value = t.name; opt.textContent = t.name; teamFilter.appendChild(opt);
-        });
-        if (baseTeams.some(t => t.name === selectedTeam)) {
-            teamFilter.value = selectedTeam;
-        }
-        teamFilter.disabled = false;
-    }
-    
     let filteredMatches = localDB.matches.filter(m => (!m.phase || m.phase === phase));
-    if (zoneCode) {
+
+    if (zoneCode === "all") {
+        // MEGA TABLA (Todas las zonas juntas)
+        if (teamFilter) {
+            teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
+            teamFilter.disabled = true;
+        }
+        
+        document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888; padding:30px;">Para ver los partidos, selecciona una zona específica.</p>';
+        
+        renderStandings(baseTeams, filteredMatches); 
+        renderTournamentLeaders(baseTeams, filteredMatches);
+    } else {
+        // VISTA POR ZONA ESPECÍFICA
+        baseTeams = baseTeams.filter(t => t.zone === zoneCode);
         filteredMatches = filteredMatches.filter(m => m.zone === zoneCode);
-    }
-    
-    let teamFilteredMatches = filteredMatches;
-    const currentTeam = teamFilter ? teamFilter.value : "";
-    if (currentTeam) {
-        teamFilteredMatches = filteredMatches.filter(m => m.home === currentTeam || m.away === currentTeam);
+
+        if (teamFilter) {
+            teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
+            baseTeams.sort((a,b) => a.name.localeCompare(b.name)).forEach(t => {
+                const opt = document.createElement('option'); opt.value = t.name; opt.textContent = t.name; teamFilter.appendChild(opt);
+            });
+            if (baseTeams.some(t => t.name === selectedTeam)) {
+                teamFilter.value = selectedTeam;
+            }
+            teamFilter.disabled = false;
+        }
+        
+        let teamFilteredMatches = filteredMatches;
+        const currentTeam = teamFilter ? teamFilter.value : "";
+        if (currentTeam) {
+            teamFilteredMatches = filteredMatches.filter(m => m.home === currentTeam || m.away === currentTeam);
+        }
+
+        renderMatches(teamFilteredMatches, localDB.teams);
+        renderStandings(baseTeams, filteredMatches); 
+        renderTournamentLeaders(baseTeams, filteredMatches); 
     }
 
-    renderMatches(teamFilteredMatches, localDB.teams);
-    renderStandings(baseTeams, filteredMatches); 
-    renderTournamentLeaders(baseTeams, filteredMatches); 
     window.renderCalendar(); 
 }
 
@@ -274,7 +293,7 @@ window.loadDailyMatches = () => {
 }
 
 // ----------------------------------------------------
-// DISEÑO: TORNEO / RENDER DE PARTIDOS (Acordeones por día)
+// DISEÑO: TORNEO / RENDER DE PARTIDOS
 // ----------------------------------------------------
 function renderMatches(matches, allTeams) {
     const container = document.getElementById('matches-container')
@@ -437,9 +456,9 @@ window.renderCalendar = () => {
     localDB.matches.forEach(m => {
         const matchPhase = m.phase || "Fase Regular";
         if(m.date && matchPhase === phase) {
-            // Aplicación de los Filtros de Zona y Equipo
-            if (zoneCode && m.zone !== zoneCode) return;
-            if (currentTeam && m.home !== currentTeam && m.away !== currentTeam) return;
+            // Aplicación dinámica de Filtros en el Calendario
+            if (zoneCode && zoneCode !== "all" && m.zone !== zoneCode) return;
+            if (currentTeam && zoneCode !== "all" && m.home !== currentTeam && m.away !== currentTeam) return;
 
             const [y, mo, d] = m.date.split('-');
             if(parseInt(y) === calYear && parseInt(mo) - 1 === calMonth) {
@@ -848,7 +867,6 @@ function renderStandings(teams, matches) {
             pctDisplay = (t.pg / t.pj).toFixed(2);
         }
 
-        // Lógica de Colores Clasificatorios
         let posColorBg = '#f1f5f9';
         let posColorText = 'var(--black)';
         let posBorder = '#cbd5e1';
@@ -857,8 +875,6 @@ function renderStandings(teams, matches) {
             posColorBg = '#28a745'; posColorText = '#fff'; posBorder = '#28a745';
         } else if (i >= 4 && i < 12) {
             posColorBg = '#8fd19e'; posColorText = '#fff'; posBorder = '#8fd19e';
-        } else if (i === 16 || i === 17) {
-            posColorBg = '#dc3545'; posColorText = '#fff'; posBorder = '#dc3545';
         }
 
         const last5 = t.form.slice(-5);
