@@ -141,8 +141,7 @@ window.loadDailyMatches = () => {
         const hRecord = getTeamRecord(m.home); const aRecord = getTeamRecord(m.away);
 
         const channelObj = localDB.channels.find(c => c.name === m.channel);
-        // Ajustado tamaño logo canal (28px) en el listado del día
-        const channelHtml = channelObj ? `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 28px; object-fit: contain; margin-left: 10px; background: white; border-radius: 4px; padding: 2px;">` : '';
+        const channelHtml = channelObj ? `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 28px; object-fit: contain; margin-left: 10px; background: white; border-radius: 4px; padding: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">` : '';
 
         const hPts = parseInt(m.homePts); const aPts = parseInt(m.awayPts);
         const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : '';
@@ -214,7 +213,6 @@ function renderMatches(matches, allTeams) {
                 const hRecord = getTeamRecord(m.home); const aRecord = getTeamRecord(m.away);
 
                 const channelObj = localDB.channels.find(c => c.name === m.channel);
-                // Ajustado tamaño logo canal (28px) en el listado del torneo
                 const channelHtml = channelObj ? `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 28px; object-fit: contain; margin-left: 10px; background: white; border-radius: 4px; padding: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">` : '';
 
                 const hPts = parseInt(m.homePts); const aPts = parseInt(m.awayPts);
@@ -407,7 +405,6 @@ function renderStandings(teams, matches) {
         if(dg > 0) { dgClass = 'dg-pos'; dgText = '+' + dg }
         if(dg < 0) { dgClass = 'dg-neg' }
         
-        // 2 Decimales para el PCT
         let pctDisplay = "0.00"
         if (t.pj > 0) {
             pctDisplay = (t.pg / t.pj).toFixed(2);
