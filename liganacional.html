@@ -15,20 +15,12 @@
     <!-- ICONS -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
-    
-    <!-- Ícono para la pantalla de inicio en iOS -->
-    <link rel="apple-touch-icon" href="assets/image/favicon.png">
-
-    <!-- Hace que la web funcione como una App Nativa (Oculta la barra de Safari) -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Básquet">
 
 </head>
 <body>
 
     <header class="header" id="header" data-header>
-        
+
         <div class="container">
 
             <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
@@ -117,15 +109,15 @@
 
                     <div class="filter-container hidden" id="daily-filters">
 
-                        <div class="custom-select-wrapper" style="display:flex; align-items:flex-end; gap: 10px; max-width: 400px; margin: 0 auto; width: 100%;">
+                        <div style="display:flex; align-items:flex-end; justify-content:center; gap: 10px; max-width: 400px; margin: 0 auto; width: 100%;">
 
-                            <div style="flex:1;">
+                            <div class="custom-select-wrapper" style="flex:1; margin-bottom: 0;">
                                 <label for="dailyDateSelect">Fecha de los Partidos</label>
-                                <input type="date" id="dailyDateSelect" class="custom-select" style="min-width:auto;" onchange="loadDailyMatches()">
+                                <input type="date" id="dailyDateSelect" class="custom-select" style="width:100%;" onchange="loadDailyMatches()">
                             </div>
 
-                            <button class="btn-hoy" onclick="setToday()">HOY</button>
-
+                            <button class="btn-hoy" style="height: 48px; padding: 0 20px; white-space: nowrap; flex-shrink: 0; background: var(--accent-color); color: white; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s;" onclick="setToday()">HOY</button>
+                        
                         </div>
 
                     </div>
@@ -217,7 +209,7 @@
                         <div id="daily-matches-container">
                             <p style="text-align:center; color:#888; padding: 30px;">Selecciona una fecha.</p>
                         </div>
-
+                        
                     </div>
 
                     <div id="view-calendar-content" class="hidden">
@@ -269,50 +261,14 @@
 
     <style>
 
-        .racha-box 
-        { 
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .r-badge 
-        { 
-            width: 22px;
-            height: 22px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem; 
-            font-weight: 900;
-            color: white;
-        }
-
-        .r-win 
-        { 
-            background-color: var(--green);
-        }
-
-        .r-loss
-        {
-            background-color: var(--red);
-        }
-
-        .col-racha 
-        {
-            text-align: center;
-        }
+        .racha-box { display: flex; gap: 4px; justify-content: center; align-items: center; }
+        .r-badge { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: white; }
+        .r-win { background-color: var(--green); } .r-loss { background-color: var(--red); }
+        .col-racha { text-align: center; }
         
-        .team-link
-        {
-            color: inherit;
-            text-decoration: none;
-        }
+        .team-link { color: inherit; text-decoration: none; }
 
         .day-accordion { margin-bottom: 12px; }
-
         .day-accordion summary {
             background: #f8fafc; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 0.85rem; color: var(--accent-color);
             cursor: pointer; list-style: none; display: flex; align-items: center; border: 1px dashed var(--border-color); text-transform: uppercase;
@@ -335,6 +291,7 @@
             padding: 6px 4px; display: flex; flex-direction: column; cursor: default; box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
             overflow: hidden; width: 100%;
         }
+
         .cal-ev-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed var(--border-color); }
         .cal-ev-time { font-size: 0.7rem; font-weight: 900; color: var(--cool-gray); white-space: nowrap; display: flex; align-items: center; gap: 3px; }
         .cal-ev-match { display: flex; justify-content: center; align-items: center; width: 100%; flex-wrap: nowrap; gap: 2px; }
@@ -343,9 +300,7 @@
         .cal-ev-team.away { justify-content: flex-start; }
         .cal-ev-code { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: clip; }
         .cal-team-logo { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
-        
-        .cal-channel-logo { width: 30px; height: 30px; object-fit: contain; border-radius: 4px; background: white; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;}
-        
+        .cal-channel-logo { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; background: white; padding: 1px; border: 1px solid #e2e8f0; flex-shrink: 0;}
         .cal-ev-res-box { display: flex; align-items: center; background: var(--bg-base); padding: 1px 4px; border-radius: 4px; margin: 0 1px; flex-shrink: 0; white-space: nowrap; border: 1px solid var(--border-color); }
         .cal-ev-res-pts { font-size: 0.75rem; }
         .cal-ev-res-sep { margin: 0 2px; color: var(--cool-gray); font-size: 0.65rem; font-weight: 800; }
@@ -356,14 +311,14 @@
 
         @media (max-width: 768px) {
             
+
             .table-responsive { overflow-x: hidden; width: 100%; }
             .table-responsive table { font-size: 0.85rem; width: 100%; min-width: 100%; }
             .table-responsive th, .table-responsive td { padding: 4px 2px; font-size: 0.85rem !important; }
             .t-logo { width: 22px; height: 22px; margin: 0 auto; display: block; }
-            .col-racha { display: none; }
+            .col-racha { display: none; } /* Ocultamos la racha en celular para que entre todo perfecto */
             .cell-pos-box { width: 20px; height: 20px; font-size: 0.75rem; margin: 0 auto; }
 
-            /* CALENDARIO MOBILE */
             .calendar-grid { grid-template-columns: 1fr; gap: 0; grid-auto-rows: auto; }
             .calendar-day-header { display: none; }
             .calendar-day { display: flex; flex-direction: column; align-items: stretch; padding: 15px 10px; border-bottom: 1px solid var(--border-color); border-radius: 0; border-top: none; border-left: none; border-right: none; min-height: unset; }
@@ -376,7 +331,7 @@
             .cal-ev-top { margin-bottom: 12px; padding-bottom: 8px; }
             .cal-ev-time { font-size: 1rem; gap: 5px; }
             .cal-team-logo { width: 32px; height: 32px; }
-            .cal-channel-logo { width: 38px; height: 38px; }
+            .cal-channel-logo { width: 28px; height: 28px; }
             .cal-ev-code { font-size: 1.15rem; }
             .cal-ev-res-pts { font-size: 1.3rem; }
             .cal-ev-res-sep { font-size: 1rem; margin: 0 5px; }
@@ -384,6 +339,7 @@
             .cal-ev-res-box { padding: 4px 10px; border-radius: 8px; }
             .cal-ev-match { gap: 8px; }
             .cal-ev-team { gap: 8px; }
+
         }
 
         body.dark-mode .calendar-day { background: #0f172a; border-color: #334155; }
@@ -400,6 +356,6 @@
 
     <script type="module" src="assets/js/liganacional.js"></script>
     <script src="assets/js/principal.js"></script>
-  
+    
 </body>
 </html>
