@@ -15,7 +15,9 @@ const app = initializeApp(firebaseConfig)
 const dbFire = getFirestore(app)
 const defaultLogo = "assets/image/favicon.png"
 
-let localDB = { teams: [], matches: [], phases: [] }
+let localDB = { teams: [], matches: [], phases: [], channels: [] }
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
 
 async function initApp() {
     try {
@@ -24,6 +26,7 @@ async function initApp() {
 
         if (docSnap.exists()) {
             localDB = docSnap.data()
+            if(!localDB.channels) localDB.channels = [];
             populatePhases()
         } 
     } catch (error) { 
@@ -32,9 +35,6 @@ async function initApp() {
 }
 initApp()
 
-// ----------------------------------------------------
-// FASES DINÁMICAS (Página Usuario)
-// ----------------------------------------------------
 function populatePhases() {
     const phaseSelect = document.getElementById('phaseSelect');
     if(!phaseSelect) return;
@@ -56,21 +56,30 @@ function populatePhases() {
 window.toggleMainView = (view) => {
     const btnZone = document.getElementById('btn-view-zone')
     const btnDaily = document.getElementById('btn-view-daily')
+    const btnCalendar = document.getElementById('btn-view-calendar')
+    
     const zoneFilters = document.getElementById('zone-filters')
     const dailyFilters = document.getElementById('daily-filters')
+    
     const zoneContent = document.getElementById('view-zone-content')
     const dailyContent = document.getElementById('view-daily-content')
+    const calendarContent = document.getElementById('view-calendar-content')
+
+    btnZone.classList.remove('active'); btnDaily.classList.remove('active'); btnCalendar.classList.remove('active');
+    dailyFilters.classList.add('hidden'); zoneFilters.classList.add('hidden');
+    zoneContent.classList.add('hidden'); dailyContent.classList.add('hidden'); calendarContent.classList.add('hidden');
 
     if (view === 'zone') {
-        btnZone.classList.add('active'); btnDaily.classList.remove('active')
-        zoneFilters.classList.remove('hidden'); dailyFilters.classList.add('hidden')
-        zoneContent.classList.remove('hidden'); dailyContent.classList.add('hidden')
-    } else {
-        btnDaily.classList.add('active'); btnZone.classList.remove('active')
-        dailyFilters.classList.remove('hidden'); zoneFilters.classList.add('hidden')
-        dailyContent.classList.remove('hidden'); zoneContent.classList.add('hidden')
+        btnZone.classList.add('active'); zoneFilters.classList.remove('hidden'); zoneContent.classList.remove('hidden');
+    } else if (view === 'daily') {
+        btnDaily.classList.add('active'); dailyFilters.classList.remove('hidden'); dailyContent.classList.remove('hidden');
         if(!document.getElementById('dailyDateSelect').value) window.setToday()
         else window.loadDailyMatches()
+    } else if (view === 'calendar') {
+        btnCalendar.classList.add('active'); 
+        zoneFilters.classList.remove('hidden'); // Mantiene activos los filtros Fase/Zona/Equipo en el Calendario
+        calendarContent.classList.remove('hidden');
+        window.renderCalendar();
     }
 }
 
@@ -88,60 +97,64 @@ window.updatePublicZoneSelect = () => {
 
     const uniqueZones = [...new Set(localDB.teams.filter(t => t.phase === phase || (!t.phase && phase === "Fase Regular")).map(t => t.zone))];
     
-    let options = '<option value="">Seleccionar Zona...</option>';
+    // Opción agregada para mostrar "Todas las Zonas" por defecto
+    let options = '<option value="">Todas las Zonas</option>';
     uniqueZones.sort().forEach(z => {
-        options += `<option value="${z}">${z}</option>`;
+        if(z) options += `<option value="${z}">${z}</option>`;
     });
 
     zoneSelect.innerHTML = options;
-    zoneSelect.disabled = uniqueZones.length === 0;
+    zoneSelect.disabled = false;
 
     if(teamFilter) {
         teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
-        teamFilter.disabled = true;
+        teamFilter.disabled = false;
     }
 
-    document.getElementById('matches-container').innerHTML = '<p style="text-align:center; color:#888; padding:30px;">Selecciona una zona para ver los partidos.</p>';
-    document.getElementById('standings-body').innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888; padding:30px;">Esperando selección...</td></tr>';
+    window.loadData();
 };
 
 window.loadData = () => {
-    const phase = document.getElementById('phaseSelect').value
-    const zoneCode = document.getElementById('zoneSelect').value
-    if (!zoneCode) return
+    const phase = document.getElementById('phaseSelect') ? document.getElementById('phaseSelect').value : "Fase Regular";
+    const zoneCode = document.getElementById('zoneSelect') ? document.getElementById('zoneSelect').value : "";
+    const teamFilter = document.getElementById('teamFilterSelect');
+    const selectedTeam = teamFilter ? teamFilter.value : "";
     
-    const zoneTeams = localDB.teams.filter(t => t.zone === zoneCode && (!t.phase || t.phase === phase))
-    const zoneMatches = localDB.matches.filter(m => m.zone === zoneCode && (!m.phase || m.phase === phase))
-    const teamFilter = document.getElementById('teamFilterSelect')
+    let baseTeams = localDB.teams.filter(t => (!t.phase || t.phase === phase));
+    if (zoneCode) {
+        baseTeams = baseTeams.filter(t => t.zone === zoneCode);
+    }
 
     if (teamFilter) {
-        teamFilter.innerHTML = '<option value="">Todos los equipos</option>'
-        teamFilter.disabled = false
-        zoneTeams.sort((a,b) => a.name.localeCompare(b.name)).forEach(t => {
-            const opt = document.createElement('option'); opt.value = t.name; opt.textContent = t.name; teamFilter.appendChild(opt)
-        })
+        teamFilter.innerHTML = '<option value="">Todos los equipos</option>';
+        baseTeams.sort((a,b) => a.name.localeCompare(b.name)).forEach(t => {
+            const opt = document.createElement('option'); opt.value = t.name; opt.textContent = t.name; teamFilter.appendChild(opt);
+        });
+        if (baseTeams.some(t => t.name === selectedTeam)) {
+            teamFilter.value = selectedTeam;
+        }
+        teamFilter.disabled = false;
     }
     
-    renderMatches(zoneMatches, localDB.teams)
-    renderStandings(zoneTeams, zoneMatches)
-}
-
-window.filterMatchesByTeam = () => {
-    const phase = document.getElementById('phaseSelect').value
-    const zoneCode = document.getElementById('zoneSelect').value
-    const selectedTeam = document.getElementById('teamFilterSelect').value
-    if (!zoneCode) return
-    
-    let filteredMatches = localDB.matches.filter(m => m.zone === zoneCode && (!m.phase || m.phase === phase))
-    if (selectedTeam) {
-        filteredMatches = filteredMatches.filter(m => m.home === selectedTeam || m.away === selectedTeam)
+    let filteredMatches = localDB.matches.filter(m => (!m.phase || m.phase === phase));
+    if (zoneCode) {
+        filteredMatches = filteredMatches.filter(m => m.zone === zoneCode);
     }
-    renderMatches(filteredMatches, localDB.teams)
+    
+    let teamFilteredMatches = filteredMatches;
+    const currentTeam = teamFilter ? teamFilter.value : "";
+    if (currentTeam) {
+        teamFilteredMatches = filteredMatches.filter(m => m.home === currentTeam || m.away === currentTeam);
+    }
+
+    renderMatches(teamFilteredMatches, localDB.teams);
+    renderStandings(baseTeams, filteredMatches); 
+    renderTournamentLeaders(baseTeams, filteredMatches); 
+    window.renderCalendar(); 
 }
 
-// ----------------------------------------------------
-// MOTOR DE RÉCORDS
-// ----------------------------------------------------
+window.filterMatchesByTeam = () => { window.loadData(); }
+
 function getTeamRecord(teamName, phase) {
     let wins = 0; let losses = 0;
     localDB.matches.forEach(m => {
@@ -203,6 +216,9 @@ window.loadDailyMatches = () => {
             const hRecord = getTeamRecord(m.home, phaseMatched);
             const aRecord = getTeamRecord(m.away, phaseMatched);
 
+            const channelObj = localDB.channels.find(c => c.name === m.channel);
+            const channelHtml = channelObj ? `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 28px; object-fit: contain; margin-left: 10px; background: white; border-radius: 4px; padding: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">` : '';
+
             let actionButtons = ''; 
             if (m.homePts !== '-' && m.awayPts !== '-') {
                 actionButtons = `<button class="dmc-btn" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`
@@ -221,7 +237,7 @@ window.loadDailyMatches = () => {
             html += `
             <div class="daily-match-card">
                 <div class="dmc-info">
-                    <span class="dmc-time">${timeStr}</span>
+                    <span class="dmc-time" style="display:flex; align-items:center;">${timeStr} ${channelHtml}</span>
                     <span class="dmc-status">${statusStr}</span>
                 </div>
                 <div class="dmc-teams">
@@ -258,7 +274,7 @@ window.loadDailyMatches = () => {
 }
 
 // ----------------------------------------------------
-// DISEÑO: TORNEO / RENDER DE PARTIDOS
+// DISEÑO: TORNEO / RENDER DE PARTIDOS (Acordeones por día)
 // ----------------------------------------------------
 function renderMatches(matches, allTeams) {
     const container = document.getElementById('matches-container')
@@ -269,13 +285,14 @@ function renderMatches(matches, allTeams) {
         return
     }
 
-    const grouped = {}
-    matches.forEach(m => { 
-        if (!grouped[m.round]) grouped[m.round] = []
-        grouped[m.round].push(m)
-    })
+    const groupedByRound = {}
+    matches.forEach(m => {
+        if (!groupedByRound[m.round]) groupedByRound[m.round] = {};
+        if (!groupedByRound[m.round][m.date]) groupedByRound[m.round][m.date] = [];
+        groupedByRound[m.round][m.date].push(m);
+    });
     
-    const rounds = Object.keys(grouped).sort((a, b) => {
+    const rounds = Object.keys(groupedByRound).sort((a, b) => {
         const numA = a.match(/\d+/) ? parseInt(a.match(/\d+/)[0]) : 0;
         const numB = b.match(/\d+/) ? parseInt(b.match(/\d+/)[0]) : 0;
         if (numA !== numB) return numA - numB;
@@ -285,89 +302,207 @@ function renderMatches(matches, allTeams) {
     let isFirst = true
 
     rounds.forEach(round => {
-        const activeClass = isFirst ? 'active' : ''
-        const showClass = isFirst ? 'show' : ''
-        isFirst = false
-        let matchesHtml = ''
+        const activeClass = isFirst ? 'active' : ''; const showClass = isFirst ? 'show' : ''; isFirst = false;
+        let matchesHtml = '';
+        let totalMatchesInRound = 0;
 
-        grouped[round].sort((a, b) => {
-            const dateTimeA = new Date((a.date || '1970-01-01') + 'T' + (a.time || '00:00'))
-            const dateTimeB = new Date((b.date || '1970-01-01') + 'T' + (b.time || '00:00'))
-            return dateTimeB - dateTimeA
-        }).forEach(m => {
-            const phaseMatched = m.phase || "Fase Regular";
-            const homeTeam = allTeams.find(t => t.name === m.home && (t.phase === phaseMatched || !t.phase)) || allTeams.find(t => t.name === m.home) || { logo: defaultLogo };
-            const awayTeam = allTeams.find(t => t.name === m.away && (t.phase === phaseMatched || !t.phase)) || allTeams.find(t => t.name === m.away) || { logo: defaultLogo };
-            
-            const hLogo = homeTeam.logo; const aLogo = awayTeam.logo;
-            const hCode = homeTeam.code || m.home.substring(0,3).toUpperCase(); 
-            const aCode = awayTeam.code || m.away.substring(0,3).toUpperCase();
-            
-            const hRecord = getTeamRecord(m.home, phaseMatched);
-            const aRecord = getTeamRecord(m.away, phaseMatched);
+        const dates = Object.keys(groupedByRound[round]).sort((a, b) => new Date(b) - new Date(a));
 
-            let actionButtons = ''; 
-            let rowClick = '';
-            
-            if (m.homePts !== '-' && m.awayPts !== '-') {
-                actionButtons = `<button class="dmc-btn" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`
-                rowClick = `onclick="openPublicStatsModal('${m.id}')"`
-            } else {
-                actionButtons = `<button class="dmc-btn" onclick="openComparisonModal('${m.id}')"><i class="ri-scales-3-line"></i> Comparativa Previa</button>`
-                rowClick = `onclick="openComparisonModal('${m.id}')"`
-            }
-
-            const hPts = parseInt(m.homePts); const aPts = parseInt(m.awayPts);
-            const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : '';
-            const aWin = !isNaN(hPts) && !isNaN(aPts) && aPts > hPts ? 'winner' : '';
-            
-            const stadiumName = m.stadium && m.stadium.trim() !== '' ? m.stadium : 'Estadio a definir';
-            const timeStr = m.time ? m.time : '--:--';
-            const statusStr = (m.homePts !== '-' && m.awayPts !== '-') ? 'Finalizado' : 'Pendiente';
-            const dateInfo = formatDateInfo(m.date);
+        dates.forEach(dateStr => {
+            const dayMatches = groupedByRound[round][dateStr];
+            const dateInfo = formatDateInfo(dateStr);
+            const dayString = `${dateInfo.dayName} ${dateInfo.dateShort}`;
+            const count = dayMatches.length;
+            totalMatchesInRound += count;
 
             matchesHtml += `
-            <div class="daily-match-card" style="cursor: pointer;" ${rowClick}>
-                <div class="dmc-info">
-                    <span style="font-size:0.75rem; color:var(--cool-gray); font-weight:800; margin-bottom:4px;"><i class="ri-calendar-line"></i> ${dateInfo.dateShort}</span>
-                    <span class="dmc-time">${timeStr}</span>
-                    <span class="dmc-status">${statusStr}</span>
-                </div>
-                <div class="dmc-teams">
-                    <div class="dmc-team-row">
-                        <div class="dmc-team-left">
-                            <img src="${hLogo}" class="dmc-logo">
-                            <div class="dmc-name-box">
-                                <span class="dmc-name">${hCode}</span>
-                                <span class="dmc-record">(${hRecord})</span>
-                            </div>
-                        </div>
-                        <span class="dmc-score ${hWin}">${m.homePts !== '-' ? m.homePts : '-'}</span>
+            <details class="day-accordion" open>
+                <summary><i class="ri-calendar-event-fill" style="margin-right:8px;"></i> ${dayString} <span style="font-size:0.75rem; color:#888; margin-left:auto;">(${count} partido${count > 1 ? 's' : ''})</span></summary>
+                <div class="day-accordion-content">`;
+
+            dayMatches.sort((a, b) => (b.time || "00:00").localeCompare(a.time || "00:00")).forEach(m => {
+                const phaseMatched = m.phase || "Fase Regular";
+                const homeTeam = allTeams.find(t => t.name === m.home && (t.phase === phaseMatched || !t.phase)) || allTeams.find(t => t.name === m.home) || { logo: defaultLogo };
+                const awayTeam = allTeams.find(t => t.name === m.away && (t.phase === phaseMatched || !t.phase)) || allTeams.find(t => t.name === m.away) || { logo: defaultLogo };
+                
+                const hLogo = homeTeam.logo; const aLogo = awayTeam.logo;
+                const hCode = homeTeam.code || m.home.substring(0,3).toUpperCase(); 
+                const aCode = awayTeam.code || m.away.substring(0,3).toUpperCase();
+                
+                const hRecord = getTeamRecord(m.home, phaseMatched);
+                const aRecord = getTeamRecord(m.away, phaseMatched);
+
+                const channelObj = localDB.channels.find(c => c.name === m.channel);
+                const channelHtml = channelObj ? `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 28px; object-fit: contain; margin-left: 10px; background: white; border-radius: 4px; padding: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">` : '';
+
+                let actionButtons = ''; let rowClick = '';
+                
+                if (m.homePts !== '-' && m.awayPts !== '-') {
+                    actionButtons = `<button class="dmc-btn" onclick="openPublicStatsModal('${m.id}')"><i class="ri-bar-chart-box-line"></i> Estadísticas</button>`
+                    rowClick = `onclick="openPublicStatsModal('${m.id}')"`
+                } else {
+                    actionButtons = `<button class="dmc-btn" onclick="openComparisonModal('${m.id}')"><i class="ri-scales-3-line"></i> Comparativa Previa</button>`
+                    rowClick = `onclick="openComparisonModal('${m.id}')"`
+                }
+
+                const hPts = parseInt(m.homePts); const aPts = parseInt(m.awayPts);
+                const hWin = !isNaN(hPts) && !isNaN(aPts) && hPts > aPts ? 'winner' : '';
+                const aWin = !isNaN(hPts) && !isNaN(aPts) && aPts > hPts ? 'winner' : '';
+                
+                const stadiumName = m.stadium && m.stadium.trim() !== '' ? m.stadium : 'Estadio a definir';
+                const timeStr = m.time ? m.time : '--:--';
+                const statusStr = (m.homePts !== '-' && m.awayPts !== '-') ? 'Finalizado' : 'Pendiente';
+
+                matchesHtml += `
+                <div class="daily-match-card" style="cursor: pointer;" ${rowClick}>
+                    <div class="dmc-info">
+                        <span class="dmc-time" style="display:flex; align-items:center;">${timeStr} ${channelHtml}</span>
+                        <span class="dmc-status">${statusStr}</span>
                     </div>
-                    <div class="dmc-team-row">
-                        <div class="dmc-team-left">
-                            <img src="${aLogo}" class="dmc-logo">
-                            <div class="dmc-name-box">
-                                <span class="dmc-name">${aCode}</span>
-                                <span class="dmc-record">(${aRecord})</span>
+                    <div class="dmc-teams">
+                        <div class="dmc-team-row">
+                            <div class="dmc-team-left">
+                                <img src="${hLogo}" class="dmc-logo">
+                                <div class="dmc-name-box">
+                                    <span class="dmc-name">${hCode}</span>
+                                    <span class="dmc-record">(${hRecord})</span>
+                                </div>
                             </div>
+                            <span class="dmc-score ${hWin}">${m.homePts !== '-' ? m.homePts : '-'}</span>
                         </div>
-                        <span class="dmc-score ${aWin}">${m.awayPts !== '-' ? m.awayPts : '-'}</span>
+                        <div class="dmc-team-row">
+                            <div class="dmc-team-left">
+                                <img src="${aLogo}" class="dmc-logo">
+                                <div class="dmc-name-box">
+                                    <span class="dmc-name">${aCode}</span>
+                                    <span class="dmc-record">(${aRecord})</span>
+                                </div>
+                            </div>
+                            <span class="dmc-score ${aWin}">${m.awayPts !== '-' ? m.awayPts : '-'}</span>
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--cool-gray); margin-top:6px; display:flex; align-items:center; gap:5px;"><i class="ri-map-pin-line"></i> ${stadiumName}</div>
                     </div>
-                    <div style="font-size:0.75rem; color:var(--cool-gray); margin-top:6px; display:flex; align-items:center; gap:5px;"><i class="ri-map-pin-line"></i> ${stadiumName}</div>
-                </div>
-                <div class="dmc-actions" onclick="event.stopPropagation();">
-                    ${actionButtons}
-                </div>
-            </div>`
-        })
+                    <div class="dmc-actions" onclick="event.stopPropagation();">
+                        ${actionButtons}
+                    </div>
+                </div>`
+            });
+
+            matchesHtml += `</div></details>`;
+        });
 
         container.innerHTML += `
             <div class="round-wrapper">
-                <div class="round-header ${activeClass}" onclick="toggleRound(this)"><span>${round}</span><i class='bx bx-chevron-down arrow-icon'></i></div>
+                <div class="round-header ${activeClass}" onclick="toggleRound(this)"><span>${round} <span style="font-size:0.8rem; color:var(--cool-gray); margin-left:8px; font-weight:700;">(${totalMatchesInRound} partido${totalMatchesInRound > 1 ? 's' : ''})</span></span><i class='bx bx-chevron-down arrow-icon'></i></div>
                 <div class="round-content ${showClass}">${matchesHtml}</div>
             </div>`
-    })
+    });
+}
+
+// ----------------------------------------------------
+// MOTOR DE CALENDARIO MENSUAL (IN-LINE Y DESDE LUNES)
+// ----------------------------------------------------
+window.changeMonth = (dir) => {
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    else if (calMonth < 0) { calMonth = 11; calYear--; }
+    window.renderCalendar();
+}
+
+window.renderCalendar = () => {
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const dayNamesMobile = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']; 
+    document.getElementById('calendar-month-year').innerText = `${monthNames[calMonth]} ${calYear}`;
+    
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = `
+        <div class="calendar-day-header">Lun</div><div class="calendar-day-header">Mar</div><div class="calendar-day-header">Mié</div>
+        <div class="calendar-day-header">Jue</div><div class="calendar-day-header">Vie</div><div class="calendar-day-header">Sáb</div>
+        <div class="calendar-day-header">Dom</div>
+    `;
+
+    let firstDay = new Date(calYear, calMonth, 1).getDay() - 1;
+    if (firstDay < 0) firstDay = 6;
+    
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) { grid.innerHTML += `<div class="calendar-day empty"></div>`; }
+
+    const phase = document.getElementById('phaseSelect') ? document.getElementById('phaseSelect').value : "Fase Regular";
+    const zoneCode = document.getElementById('zoneSelect') ? document.getElementById('zoneSelect').value : "";
+    const currentTeam = document.getElementById('teamFilterSelect') ? document.getElementById('teamFilterSelect').value : "";
+    
+    const matchesByDate = {};
+    
+    localDB.matches.forEach(m => {
+        const matchPhase = m.phase || "Fase Regular";
+        if(m.date && matchPhase === phase) {
+            // Aplicación de los Filtros de Zona y Equipo
+            if (zoneCode && m.zone !== zoneCode) return;
+            if (currentTeam && m.home !== currentTeam && m.away !== currentTeam) return;
+
+            const [y, mo, d] = m.date.split('-');
+            if(parseInt(y) === calYear && parseInt(mo) - 1 === calMonth) {
+                const dayNum = parseInt(d);
+                if(!matchesByDate[dayNum]) matchesByDate[dayNum] = [];
+                matchesByDate[dayNum].push(m);
+            }
+        }
+    });
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const currentDate = new Date(calYear, calMonth, i);
+        const currentDayStr = dayNamesMobile[currentDate.getDay()];
+        
+        let dayHtml = `<div class="calendar-day"><div class="calendar-date"><span class="mobile-day-name">${currentDayStr}</span>${i}</div><div class="calendar-events-container">`;
+        
+        if (matchesByDate[i]) {
+            matchesByDate[i].sort((a,b) => (a.time || "00:00").localeCompare(b.time || "00:00")).forEach(m => {
+                const tHome = localDB.teams.find(t => t.name === m.home) || { code: m.home.substring(0,3).toUpperCase(), logo: defaultLogo };
+                const tAway = localDB.teams.find(t => t.name === m.away) || { code: m.away.substring(0,3).toUpperCase(), logo: defaultLogo };
+                const channelObj = localDB.channels.find(c => c.name === m.channel);
+                const channelHtml = channelObj ? `<img src="${channelObj.logo}" title="${channelObj.name}" class="cal-channel-logo">` : '';
+
+                let matchResultHtml = '';
+                let hWeight = '500'; let aWeight = '500';
+                let hColor = 'var(--text-main)'; let aColor = 'var(--text-main)';
+                
+                if (m.homePts !== '-' && m.awayPts !== '-') {
+                    const hPts = parseInt(m.homePts); const aPts = parseInt(m.awayPts);
+                    hWeight = hPts > aPts ? '900' : '500'; aWeight = aPts > hPts ? '900' : '500';
+                    hColor = hPts > aPts ? 'var(--accent-color)' : 'var(--text-main)';
+                    aColor = aPts > hPts ? 'var(--accent-color)' : 'var(--text-main)';
+                    
+                    matchResultHtml = `<div class="cal-ev-res-box"><span class="cal-ev-res-pts" style="font-weight:${hWeight}; color:${hColor};">${hPts}</span><span class="cal-ev-res-sep">-</span><span class="cal-ev-res-pts" style="font-weight:${aWeight}; color:${aColor};">${aPts}</span></div>`;
+                } else {
+                    matchResultHtml = `<span class="cal-ev-vs">vs</span>`;
+                }
+
+                const actionClick = (m.homePts !== '-' && m.awayPts !== '-') ? `openPublicStatsModal('${m.id}')` : `openComparisonModal('${m.id}')`;
+
+                dayHtml += `
+                <div class="calendar-event" onclick="${actionClick}" title="${m.home} vs ${m.away}">
+                    <div class="cal-ev-top">
+                        <span class="cal-ev-time"><i class="ri-time-line"></i> ${m.time} Hs</span>
+                        ${channelHtml}
+                    </div>
+                    <div class="cal-ev-match">
+                        <div class="cal-ev-team home">
+                            <span class="cal-ev-code" style="font-weight:${hWeight}; color:${hColor};">${tHome.code}</span>
+                            <img src="${tHome.logo}" class="cal-team-logo">
+                        </div>
+                        ${matchResultHtml}
+                        <div class="cal-ev-team away">
+                            <img src="${tAway.logo}" class="cal-team-logo">
+                            <span class="cal-ev-code" style="font-weight:${aWeight}; color:${aColor};">${tAway.code}</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+        dayHtml += `</div></div>`;
+        grid.innerHTML += dayHtml;
+    }
 }
 
 // ----------------------------------------------------
@@ -385,7 +520,7 @@ window.toggleCompStats = (view) => {
     }
 }
 
-function getTeamSeasonStats(teamName) {
+function getTeamSeasonStats(teamName, poolMatches = localDB.matches) {
     let gamesPlayed = 0, statsGames = 0, wins = 0, losses = 0
     let totals = { 
         pts: 0, opp_pts: 0, reb: 0, oreb: 0, ast: 0, stl: 0, tov: 0, 
@@ -394,12 +529,8 @@ function getTeamSeasonStats(teamName) {
         opp_reb: 0, opp_oreb: 0, opp_ast: 0, opp_stl: 0, opp_tov: 0 
     };
 
-    localDB.matches.forEach(m => {
+    poolMatches.forEach(m => {
         if (m.homePts === '-' || m.awayPts === '-') return
-        const matchPhase = m.phase || "Fase Regular";
-        
-        if (matchPhase !== "Fase Regular") return; 
-
         let isHome = m.home === teamName
         let isAway = m.away === teamName
 
@@ -444,6 +575,29 @@ function getTeamSeasonStats(teamName) {
     }
 }
 
+function renderTournamentLeaders(teams, matchesPool) {
+    const container = document.getElementById('tournament-leaders');
+    if(!container) return;
+    let statsArray = teams.map(t => {
+        const s = getTeamSeasonStats(t.name, matchesPool);
+        return { name: t.name, code: t.code || t.name.substring(0,3).toUpperCase(), logo: t.logo, pts: parseFloat(s.pts), opp_pts: parseFloat(s.opp_pts), reb: parseFloat(s.reb), ast: parseFloat(s.ast) };
+    }).filter(t => t.pts > 0 && !isNaN(t.pts));
+
+    if(statsArray.length === 0) { container.innerHTML = '<p style="text-align:center; color:#888; width: 100%; grid-column: 1 / -1;">No hay estadísticas suficientes.</p>'; return; }
+
+    const topPts = [...statsArray].sort((a,b) => b.pts - a.pts)[0];
+    const topDef = [...statsArray].sort((a,b) => a.opp_pts - b.opp_pts)[0];
+    const topReb = [...statsArray].sort((a,b) => b.reb - a.reb)[0];
+    const topAst = [...statsArray].sort((a,b) => b.ast - a.ast)[0];
+
+    container.innerHTML = `
+        <div class="leader-card" title="Mayor promedio de puntos a favor"><div class="leader-icon-box"><img src="${topPts.logo}"></div><div class="leader-info"><span class="leader-lbl"><i class="ri-fire-fill"></i> Mejor Ataque</span><span class="leader-name">${topPts.code}</span></div><span class="leader-val">${topPts.pts.toFixed(1)}</span></div>
+        <div class="leader-card" title="Menor promedio de puntos permitidos"><div class="leader-icon-box"><img src="${topDef.logo}"></div><div class="leader-info"><span class="leader-lbl"><i class="ri-shield-fill"></i> Mejor Defensa</span><span class="leader-name">${topDef.code}</span></div><span class="leader-val defense">${topDef.opp_pts.toFixed(1)}</span></div>
+        <div class="leader-card" title="Mayor promedio de rebotes totales"><div class="leader-icon-box"><img src="${topReb.logo}"></div><div class="leader-info"><span class="leader-lbl"><i class="ri-bar-chart-box-fill"></i> Rebotes</span><span class="leader-name">${topReb.code}</span></div><span class="leader-val">${topReb.reb.toFixed(1)}</span></div>
+        <div class="leader-card" title="Mayor promedio de asistencias"><div class="leader-icon-box"><img src="${topAst.logo}"></div><div class="leader-info"><span class="leader-lbl"><i class="ri-team-fill"></i> Asistencias</span><span class="leader-name">${topAst.code}</span></div><span class="leader-val">${topAst.ast.toFixed(1)}</span></div>
+    `;
+}
+
 window.openComparisonModal = (matchId) => {
     const m = localDB.matches.find(x => String(x.id) === String(matchId))
     if(!m) return
@@ -455,8 +609,8 @@ window.openComparisonModal = (matchId) => {
     
     const hLogo = homeTeam.logo; const aLogo = awayTeam.logo;
 
-    const hStats = getTeamSeasonStats(m.home)
-    const aStats = getTeamSeasonStats(m.away)
+    const hStats = getTeamSeasonStats(m.home, localDB.matches.filter(match => match.phase === phaseMatched))
+    const aStats = getTeamSeasonStats(m.away, localDB.matches.filter(match => match.phase === phaseMatched))
 
     document.getElementById('comp-home-name').innerHTML = `<img src="${hLogo}" class="modal-team-logo"><br>${m.home}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord Fase Reg.: ${hStats.record}</span>`
     document.getElementById('comp-away-name').innerHTML = `<img src="${aLogo}" class="modal-team-logo"><br>${m.away}<br><span style="font-size: 0.85rem; color: var(--cool-gray); font-weight: 700; text-transform: none;">Récord Fase Reg.: ${aStats.record}</span>`
@@ -546,8 +700,6 @@ window.openPublicStatsModal = (matchId) => {
     const m = localDB.matches.find(x => String(x.id) === String(matchId))
     if(!m) return
     
-    const teamLink = `equipo.html?liga=liga_metropolitana&equipo=${encodeURIComponent(m.home)}`;
-    
     const homeTeam = localDB.teams.find(t => t.name === m.home) || { logo: defaultLogo };
     const awayTeam = localDB.teams.find(t => t.name === m.away) || { logo: defaultLogo };
     
@@ -617,7 +769,6 @@ function calculateStandings(teams, matches) {
         form: [] // Racha
     }))
 
-    // Ordenamos cronológicamente para que la racha se guarde en orden real
     const sortedMatches = [...matches].sort((a, b) => {
         const dateA = new Date((a.date || '1970-01-01') + 'T' + (a.time || '00:00'));
         const dateB = new Date((b.date || '1970-01-01') + 'T' + (b.time || '00:00'));
@@ -676,7 +827,7 @@ function renderStandings(teams, matches) {
     tbody.innerHTML = ''
     
     if (teams.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan=\"9\" style="text-align:center; color:#888; padding:30px;">No hay equipos registrados.</td></tr>'
+        tbody.innerHTML = '<tr><td colspan=\"10\" style="text-align:center; color:#888; padding:30px;">No hay equipos registrados.</td></tr>'
         return
     }
 
@@ -691,6 +842,11 @@ function renderStandings(teams, matches) {
         if(dg < 0) { dgClass = 'dg-neg' }
         
         const codeName = t.code ? t.code : t.name.substring(0,3).toUpperCase()
+        
+        let pctDisplay = "0.00"
+        if (t.pj > 0) {
+            pctDisplay = (t.pg / t.pj).toFixed(2);
+        }
 
         // Lógica de Colores Clasificatorios
         let posColorBg = '#f1f5f9';
@@ -698,14 +854,13 @@ function renderStandings(teams, matches) {
         let posBorder = '#cbd5e1';
 
         if (i < 4) {
-            // 1° al 4° Puesto
             posColorBg = '#28a745'; posColorText = '#fff'; posBorder = '#28a745';
         } else if (i >= 4 && i < 12) {
-            // 5° al 12° Puesto
             posColorBg = '#8fd19e'; posColorText = '#fff'; posBorder = '#8fd19e';
+        } else if (i === 16 || i === 17) {
+            posColorBg = '#dc3545'; posColorText = '#fff'; posBorder = '#dc3545';
         }
 
-        // HTML de la Racha (Últimos 5)
         const last5 = t.form.slice(-5);
         let rachaHtml = '<div class="racha-box">';
         if (last5.length === 0) {
@@ -723,9 +878,9 @@ function renderStandings(teams, matches) {
         const row = `
             <tr>
                 <td><div class=\"cell-pos-box\" style=\"background:${posColorBg}; color:${posColorText}; border-color:${posBorder};\">${i + 1}</div></td>
-                <td class=\"t-left\">
-                    <a href="${teamLink}" target="_blank" class=\"team-cell team-link\">
-                        <img src=\"${t.logo}\" class=\"t-logo\">
+                <td style=\"text-align:center;\">
+                    <a href="${teamLink}" target="_blank" class=\"team-link\" style="display:inline-block; text-decoration:none; color:inherit;">
+                        <img src=\"${t.logo}\" class=\"t-logo\" title=\"${t.name}\" style="margin: 0 auto; display: block;">
                         <span class=\"t-name-full\">${t.name}</span>
                         <span class=\"t-name-code\">${codeName}</span>
                     </a>
@@ -733,10 +888,11 @@ function renderStandings(teams, matches) {
                 <td class=\"col-pj\">${t.pj}</td>
                 <td class=\"col-pg\">${t.pg}</td>
                 <td class=\"col-pp\">${t.pp}</td>
+                <td class=\"col-pct\">${pctDisplay}</td>
                 <td class=\"col-pf\">${t.pf}</td>
                 <td class=\"col-pc\">${t.pc}</td>
                 <td class=\"col-dg ${dgClass}\">${dgText}</td>
-                <td>${rachaHtml}</td>
+                <td class=\"col-racha\">${rachaHtml}</td>
             </tr>`
 
         tbody.innerHTML += row
@@ -746,7 +902,7 @@ function renderStandings(teams, matches) {
 function formatDateInfo(dateString) {
     if(!dateString) return { dayName: '-', dateShort: '-' }
     const dateObj = new Date(dateString + 'T00:00:00')
-    const days = ['DO', 'LU', 'MA', 'MI', 'JU', 'VI', 'SA']
+    const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']
     const dayNum = String(dateObj.getDate()).padStart(2, '0')
     const monthNum = String(dateObj.getMonth() + 1).padStart(2, '0')
     return { dayName: days[dateObj.getDay()], dateShort: `${dayNum}/${monthNum}` }
