@@ -7,16 +7,20 @@ navToggleBtn.addEventListener('click', () =>
 })
 
 
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || ('standalone' in window.navigator && window.navigator.standalone);
-
-if (isStandalone) {
+if (("standalone" in window.navigator) && window.navigator.standalone) {
     document.addEventListener('click', function(event) {
         const a = event.target.closest('a');
         
-
+        
         if (a && a.href && a.target !== '_blank' && a.host === window.location.host) {
-            event.preventDefault();
-            window.location.href = a.href;
+            event.preventDefault(); 
+            
+            
+            const rutaRelativa = a.getAttribute('href');
+            
+            if (rutaRelativa) {
+                window.location.replace(rutaRelativa); 
+            }
         }
     }, false);
 }
