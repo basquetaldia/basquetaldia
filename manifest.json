@@ -1,0 +1,21 @@
+{
+  "name": "Básquet Al Día",
+  "short_name": "Básquet",
+  "start_url": "./",
+  "display": "standalone",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#0050B8",
+  "icons": [
+    {
+      "src": "assets/image/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/image/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
