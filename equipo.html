@@ -19,284 +19,380 @@
 <body>
 
     <header class="header" id="header" data-header>
-
+        
         <div class="container" style="max-width: 1350px !important;">
             
             <a href="index.html" class="logo"><img src="assets/image/favicon.png" width="50px"></a>
             <button class="menu-toggle-btn" id="menu-toggle-btn" data-nav-toggle-btn><i class="ri-menu-line"></i></button>
 
             <nav class="navbar">
-
+                
                 <ul class="navbar-list">
-                    <!-- <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li> -->
-                    <!-- <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li> -->
+                    <li><a href="liganacional.html" class="navbar-link">Liga Nacional</a></li>
+                    <li><a href="ligaargentina.html" class="navbar-link">Liga Argentina</a></li>
+                    <li><a href="ligafemenina.html" class="navbar-link">Liga Femenina</a></li>
                     <li><a href="ligafederal.html" class="navbar-link">Liga Federal</a></li>
-                    <li><a href="premetro.html" class="navbar-link">Pre Liga Metro</a></li>
-                    <!-- <li><a href="formativau21.html" class="navbar-link">Liga Formativa U21</a></li> -->
+                    <li><a href="premetro.html" class="navbar-link">Liga Metropolitana</a></li>
                 </ul>
-
+                
+                <div class="header-actions">
+                    <a href="https://linktr.ee/basquetaldia" target="_blank" class="header-action-link">ENLACES</a>
+                </div>
+                
             </nav>
-
+            
         </div>
-
+        
     </header>
 
     <main>
 
         <div class="team-hero-banner">
-
+            
             <div class="container">
-
+                
                 <div class="team-header-content">
-
+                    
                     <div class="team-logo-wrapper">
                         <img id="t-logo" src="assets/image/favicon.png" alt="Escudo">
                     </div>
-
+                    
                     <div class="team-title-box">
-
+                        
                         <h1 id="t-name">Cargando Equipo...</h1>
                         
                         <div class="badges-row">
-
+                            
                             <span id="t-league" class="league-badge">Buscando datos</span>
-
+                            
                             <span id="t-stadium" style="color: #cbd5e1; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
                                 <i class="ri-map-pin-line"></i> Cargando estadio...
                             </span>
-
+                            
                         </div>
-
+                        
                     </div>
-
+                    
                 </div>
-
+                
             </div>
-
+            
         </div>
 
         <section class="team-stats-section">
-
+            
             <div class="container">
                 
                 <div class="quick-record-row">
-
+                    
                     <div class="record-card">
                         <div class="rc-label">Partidos Jugados</div>
                         <div class="rc-value" id="s-pj">0</div>
                     </div>
-
+                    
                     <div class="record-card win">
                         <div class="rc-label">Victorias</div>
                         <div class="rc-value" id="s-pg">0</div>
                     </div>
-
+                    
                     <div class="record-card loss">
                         <div class="rc-label">Derrotas</div>
                         <div class="rc-value" id="s-pp">0</div>
                     </div>
-
-
+                    
                     <div class="record-card highlight">
                         <div class="rc-label">% Victoria</div>
                         <div class="rc-value" id="s-pct">0%</div>
                     </div>
-
+                    
                 </div>
 
                 <div class="adv-stats-grid">
                     
                     <div class="adv-card">
-
+                        
                         <div class="adv-card-header">
                             <i class="ri-fire-fill"></i> Rendimiento Global
                         </div>
-
+                        
                         <div class="adv-list">
-                            
+
                             <div class="adv-item header-split">
                                 <span class="col-fav">Equipo</span>
                                 <span></span>
                                 <span class="col-con">Rival</span>
                             </div>
-
-                            <div class="adv-item split">
+                            
+                            <div class="adv-item split" id="item-promedios">
                                 <span class="val-fav" id="s-ppp">0.0</span>
                                 <span class="adv-lbl">Puntos Promedio</span>
                                 <span class="val-con" id="s-pcp">0.0</span>
                             </div>
                             
-                            <div class="adv-item single" style="margin-top: 15px;">
+                            <div class="adv-item single" id="item-ot-games" style="margin-top: 15px;">
                                 <span class="adv-lbl" style="text-align: left;">Tiempos Supl. Jugados</span>
                                 <span class="val-neutral" id="s-ot-games">0</span>
                             </div>
-
-                            <div class="adv-item single" style="border:none;">
+                            
+                            <div class="adv-item single" id="item-ot-rec" style="border:none;">
                                 <span class="adv-lbl" style="text-align: left;">Récord en Supl.</span>
                                 <span class="val-neutral" id="s-ot-rec">0-0</span>
                             </div>
-
+                            
                         </div>
+                        
                     </div>
 
-
-                    <div class="adv-card">
-
+                    <div class="adv-card" id="card-cuartos">
+                        
                         <div class="adv-card-header">
                             <i class="ri-timer-line"></i> Puntos por Cuarto
                         </div>
-
+                        
                         <div class="adv-list">
-
+                            
                             <div class="adv-item header-split">
                                 <span class="col-fav">A Favor</span>
                                 <span></span>
                                 <span class="col-con">En Contra</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-q1">0.0</span>
                                 <span class="adv-lbl">1° Cuarto</span>
                                 <span class="val-con" id="s-opp-q1">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-q2">0.0</span>
                                 <span class="adv-lbl">2° Cuarto</span>
                                 <span class="val-con" id="s-opp-q2">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-q3">0.0</span>
                                 <span class="adv-lbl">3° Cuarto</span>
                                 <span class="val-con" id="s-opp-q3">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-q4">0.0</span>
                                 <span class="adv-lbl">4° Cuarto</span>
                                 <span class="val-con" id="s-opp-q4">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split" style="border:none;">
                                 <span class="val-fav" id="s-ot">0.0</span>
                                 <span class="adv-lbl">Suplementario</span>
                                 <span class="val-con" id="s-opp-ot">0.0</span>
                             </div>
-
+                            
                         </div>
-
+                        
                     </div>
 
-                    <div class="adv-card">
-
+                    <div class="adv-card" id="card-generales">
+                        
                         <div class="adv-card-header">
                             <i class="ri-bar-chart-box-line"></i> Generales (Promedio)
                         </div>
-
+                        
                         <div class="adv-list">
-
+                            
                             <div class="adv-item header-split">
                                 <span class="col-fav">A Favor</span>
                                 <span></span>
                                 <span class="col-con">En Contra</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-reb">0.0</span>
                                 <span class="adv-lbl">Rebotes Totales</span>
                                 <span class="val-con" id="s-opp-reb">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-oreb">0.0</span>
                                 <span class="adv-lbl">Rebotes Ofens.</span>
                                 <span class="val-con" id="s-opp-oreb">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-ast">0.0</span>
                                 <span class="adv-lbl">Asistencias</span>
                                 <span class="val-con" id="s-opp-ast">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split">
                                 <span class="val-fav" id="s-stl">0.0</span>
                                 <span class="adv-lbl">Robos</span>
                                 <span class="val-con" id="s-opp-stl">0.0</span>
                             </div>
-
+                            
                             <div class="adv-item split" style="border:none;">
                                 <span class="val-fav" id="s-tov">0.0</span>
                                 <span class="adv-lbl">Pérdidas</span>
                                 <span class="val-con" id="s-opp-tov">0.0</span>
                             </div>
-
+                            
                         </div>
-
+                        
                     </div>
 
                 </div>
-
+                
             </div>
-
+            
         </section>
 
         <section class="team-matches-section">
-
+            
             <div class="container">
-
+                
                 <h2 class="section-title-main"><i class="ri-calendar-todo-line"></i> Historial de Partidos</h2>
-                <div id="team-matches-list" class="matches-grid">
+                
+                <div id="team-matches-list" class="matches-grid" style="display:flex; flex-direction:column; gap:12px;">
                     <p style="text-align:center; color:var(--text-muted); padding: 20px;">Cargando partidos...</p>
                 </div>
-
+                
             </div>
-
+            
         </section>
 
     </main>
 
     <footer>
-
+        
         <div class="footer-top">
-
+            
             <div class="container">
-
+                
                 <div class="footer-brand">
-
+                    
                     <a href="#" class="logo"><img src="assets/image/favicon.png" width="100px"></a>
                     <p class="footer-text">Seguinos en nuestras redes!</p>
+                    
                     <ul class="social-list">
-                        <li><a href="https://www.instagram.com/basquet.al.dia" class="social-link" target="_blank"><i class="ri-instagram-line"></i></a></li>
+                        <li><a href="https://linktr.ee/basquetaldia" class="social-link" target="_blank"><i class="ri-links-line"></i></a></li>
                     </ul>
-
+                    
                 </div>
-
+                
                 <div class="footer-link-box">
-
+                    
                     <ul class="footer-list">
                         <li><p class="footer-item-title">Competencias</p></li>
-                        <!-- <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li> -->
-                        <!-- <li><a href="ligaargentina.html" class="footer-link">Liga Argentina</a></li> -->
-                        <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li>
-                        <li><a href="premetro.html" class="footer-link">Pre Liga Metro</a></li>
-                        <!-- <li><a href="ligaformativau21.html" class="footer-link">Liga Formativa U21</a></li> -->
+                        <li><a href="liganacional.html" class="footer-link">Liga Nacional</a></li>
+                        <li><a href="ligaargentina.html" class="footer-link">Liga Argentina</a></li>
+                        <li><a href="ligafemenina.html" class="footer-link">Liga Femenina</a></li>
+                        <!-- <li><a href="ligafederal.html" class="footer-link">Liga Federal</a></li> -->
+                        <li><a href="premetro.html" class="footer-link">Liga Metropolitana</a></li>
                     </ul>
-
+                    
                 </div>
-
+                
             </div>
-
+            
         </div>
-
+        
         <div class="footer-botton">
+            
             <div class="container">
                 <center><p class="copyright">Desarrollado por <a href="https://www.instagram.com/pedro.miteff" target="_blank">Pedro Miteff Canal</a>.</p></center>
             </div>
+            
         </div>
-
+        
     </footer>
+
+    <style>
+        
+        #public-stats-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); /* Fondo oscuro semitransparente */
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        #public-stats-modal.hidden { display: none !important; }
+        
+        /* Caja del Modal */
+        .modal-content-stats {
+            background: var(--card-bg, #ffffff);
+            border-radius: 16px;
+            width: 90%; max-width: 800px;
+            max-height: 90vh; overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Botón Cerrar */
+        .close-modal-btn {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--bg-base, #f1f5f9); border: 1px solid var(--border-color);
+            width: 35px; height: 35px; border-radius: 50%;
+            font-weight: 900; color: var(--text-main); cursor: pointer;
+            transition: 0.2s;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .close-modal-btn:hover { background: #ef4444; color: white; border-color: #ef4444; }
+
+        /* Estructura Interna del Modal */
+        .modal-header { text-align: center; margin-bottom: 25px; border-bottom: 1px dashed var(--border-color); padding-bottom: 20px; }
+        .modal-header h2 { font-size: 1.3rem; color: var(--text-main); }
+        .ps-score { font-size: 2.5rem; font-weight: 900; color: var(--accent-color); font-family: 'Mulish', sans-serif; margin-top: 5px; }
+        
+        .stats-grid-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .stats-col { display: flex; flex-direction: column; gap: 15px; }
+        
+        .team-title { text-align: center; font-size: 1.1rem; color: var(--text-main); margin-bottom: 10px; }
+        .stat-section-title { background: var(--bg-base); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: var(--primary); text-transform: uppercase; margin: 0; font-weight: 800; border: 1px solid var(--border-color); }
+        
+        .stat-list-public { display: flex; flex-direction: column; }
+        
+        /* Responsive Modal */
+        @media (max-width: 768px) {
+            .stats-grid-cols { grid-template-columns: 1fr; gap: 30px; }
+            .modal-content-stats { padding: 20px; width: 95%; }
+            .ps-score { font-size: 2rem; }
+        }
+
+        /* Modo Oscuro Soporte Adicional */
+        body.dark-mode .modal-content-stats { background: #0f172a; border-color: #334155; }
+        body.dark-mode .close-modal-btn { background: #1e293b; color: #f8fafc; border-color: #334155; }
+        body.dark-mode .stat-section-title { background: #1e293b; color: #38bdf8; border-color: #334155; }
+    </style>
+
+    <!-- MODAL ESTADÍSTICAS DEL PARTIDO -->
+    <div id="public-stats-modal" class="hidden">
+        <div class="modal-content-stats public-modal">
+            <button onclick="closePublicStatsModal()" class="close-modal-btn">X</button>
+            <div class="modal-header">
+                <h2 id="ps-match-title" style="margin-bottom: 5px;">Local vs Visitante</h2>
+                <div id="ps-match-score" class="ps-score">0 - 0</div>
+                <div style="font-size: 0.9rem; color: var(--cool-gray); margin-top: 5px;">Estadísticas de este partido</div>
+            </div>
+            <div id="ps-stats-grid" class="stats-grid-cols">
+                <div class="stats-col">
+                    <h3 id="ps-home-name" class="team-title">Local</h3>
+                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
+                    <div id="ps-home-quarters" class="stat-list-public"></div>
+                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
+                    <div id="ps-home-advanced" class="stat-list-public"></div>
+                </div>
+                <div class="stats-col">
+                    <h3 id="ps-away-name" class="team-title">Visitante</h3>
+                    <h4 class="stat-section-title"><i class="ri-timer-line"></i> Puntos por Cuarto</h4>
+                    <div id="ps-away-quarters" class="stat-list-public"></div>
+                    <h4 class="stat-section-title"><i class="ri-bar-chart-box-line"></i> Generales</h4>
+                    <div id="ps-away-advanced" class="stat-list-public"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="assets/js/equipo.js"></script>
     <script src="assets/js/principal.js"></script>
