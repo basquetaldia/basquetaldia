@@ -16,7 +16,7 @@ const defaultLogo = "assets/image/favicon.png"
 
 // Configuración global de las ligas soportadas y sus enlaces
 const leagueConfig = {
-    "liga_nacional": { name: "Liga Nacional", hasStats: false, logo: "assets/image/LNB.svg", url: "liganacional.html" },
+    "liga_nacional": { name: "Liga Nacional", hasStats: false, logo: "assets/image/lnb.svg?v=2", url: "liganacional.html" },
     "liga_argentina": { name: "Liga Argentina", hasStats: false, logo: "assets/image/TNA.svg", url: "ligaargentina.html" },
     "liga_femenina": { name: "Liga Femenina", hasStats: false, logo: "assets/image/LFB.svg", url: "ligafemenina.html" },
     "liga_metropolitana": { name: "Liga Metropolitana", hasStats: true, logo: "assets/image/ligametro.png", url: "premetro.html" }
@@ -153,13 +153,22 @@ window.loadHubMatches = () => {
                 const hRec = getTeamRecord(db, m.home, phaseMatched);
                 const aRec = getTeamRecord(db, m.away, phaseMatched);
 
+                // Auto-asignar Basket.tv si es Liga Metro y no tiene canal
+                let finalChannel = m.channel;
+                if (leagueKey === 'liga_metropolitana' && (!finalChannel || finalChannel.trim() === '')) {
+                    finalChannel = 'Basket.tv';
+                }
+
                 let channelHtml = '';
-                if(m.channel && m.channel.trim() !== '') {
-                    const cObj = db.channels ? db.channels.find(c => c.name === m.channel) : null;
+                if(finalChannel && finalChannel.trim() !== '') {
+                    const cObj = db.channels ? db.channels.find(c => c.name.toLowerCase() === finalChannel.toLowerCase()) : null;
                     if(cObj) {
                         channelHtml = `<img src="${cObj.logo}" title="${cObj.name}" style="height: 18px; object-fit: contain; margin-top: 5px; border-radius: 4px; background: white; padding: 2px;">`;
+                    } else if (finalChannel.toLowerCase() === 'basket.tv') {
+                        // REGLA ESPECÍFICA PARA EL LOGO DE BASKET.TV
+                        channelHtml = `<img src="assets/image/bpass.png" title="Basket.tv" style="height: 18px; object-fit: contain; margin-top: 5px; border-radius: 4px; background: white; padding: 2px;">`;
                     } else {
-                        channelHtml = `<span style="font-size: 0.65rem; color: var(--cool-gray); display:block; margin-top: 4px; font-weight:800; text-transform:uppercase;">${m.channel}</span>`;
+                        channelHtml = `<span style="font-size: 0.65rem; color: var(--cool-gray); display:block; margin-top: 4px; font-weight:800; text-transform:uppercase;">${finalChannel}</span>`;
                     }
                 }
 
@@ -192,8 +201,10 @@ window.loadHubMatches = () => {
                     </div>
 
                     <div class="pm-team-home">
-                        <span class="pm-team-record">(${hRec})</span>
-                        <span class="pm-team-name" title="${m.home}">${hCode}</span>
+                        <div class="pm-team-details dir-home">
+                            <span class="pm-team-name" title="${m.home}">${hCode}</span>
+                            <span class="pm-team-record">(${hRec})</span>
+                        </div>
                         <img src="${tHome.logo}" class="pm-logo" onerror="this.src='assets/image/favicon.png'">
                     </div>
 
@@ -201,8 +212,10 @@ window.loadHubMatches = () => {
 
                     <div class="pm-team-away">
                         <img src="${tAway.logo}" class="pm-logo" onerror="this.src='assets/image/favicon.png'">
-                        <span class="pm-team-name" title="${m.away}">${aCode}</span>
-                        <span class="pm-team-record">(${aRec})</span>
+                        <div class="pm-team-details dir-away">
+                            <span class="pm-team-name" title="${m.away}">${aCode}</span>
+                            <span class="pm-team-record">(${aRec})</span>
+                        </div>
                     </div>
 
                     <div class="pm-action-col">
@@ -230,6 +243,13 @@ window.loadHubMatches = () => {
 // MODALES REDISEÑADOS (SCOREBOARD UNIFICADO + BARRAS)
 // ----------------------------------------------------------------------
 
+function formatHubDate(dateStr) {
+    if (!dateStr) return '-- / -- / ----';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) return `${parts[2]} / ${parts[1]} / ${parts[0]}`;
+    return dateStr;
+}
+
 window.openHubModal = (leagueKey, matchId, mode) => {
     const db = allDBs[leagueKey];
     const config = leagueConfig[leagueKey];
@@ -239,7 +259,7 @@ window.openHubModal = (leagueKey, matchId, mode) => {
     if(!m) return;
 
     const modalContent = document.getElementById('hub-modal-content');
-    const tHome = db.teams.find(t => t.name === m.home) || { logo: defaultLogo };
+    const tHome = db.teams.find(t => t.name === m.home) || { logo: defaultLogo, stadium: '' };
     const tAway = db.teams.find(t => t.name === m.away) || { logo: defaultLogo };
     const phase = m.phase || "Fase Regular";
     const isFinished = m.homePts !== '-' && m.awayPts !== '-';
@@ -247,7 +267,7 @@ window.openHubModal = (leagueKey, matchId, mode) => {
     const hRec = getTeamRecord(db, m.home, phase);
     const aRec = getTeamRecord(db, m.away, phase);
 
-    // 1. HEADER UNIFICADO (Scoreboard Centrado)
+    // 1. HEADER UNIFICADO (Scoreboard)
     let html = `
         <button onclick="closeHubModal()" class="close-modal-btn" style="border:none; background:transparent; font-size:1.5rem; top:10px; right:10px;"><i class="ri-close-line"></i></button>
         
@@ -265,7 +285,7 @@ window.openHubModal = (leagueKey, matchId, mode) => {
             
             <div style="display:flex; flex-direction:column; align-items:center; width: 33%; padding: 0 10px; text-align:center;">
                 ${isFinished ? 
-                    `<div style="font-size: 2.8rem; font-weight: 900; color: var(--accent-color); font-family: 'Mulish', sans-serif; letter-spacing: 1px; line-height: 1;">${m.homePts} -${m.awayPts}</div>
+                    `<div class="modal-main-score">${m.homePts} -${m.awayPts}</div>
                      <div style="font-size: 0.75rem; color: white; background: #10b981; font-weight: 900; text-transform: uppercase; margin-top:10px; padding: 4px 12px; border-radius: 12px; display:inline-block; letter-spacing:1px;">FINAL</div>` 
                     : 
                     `<div style="font-size: 1.5rem; font-weight: 900; color: var(--cool-gray); background: var(--card-bg); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border-color); display:inline-block;">VS</div>
@@ -282,18 +302,31 @@ window.openHubModal = (leagueKey, matchId, mode) => {
         </div>
     `;
 
-    // 2. MODO INFO (Tarjetas de información detalladas)
+    // 2. MODO INFO (Previa)
     if (mode === 'info') {
         const stadium = m.stadium && m.stadium.trim() !== '' ? m.stadium : (tHome.stadium || 'Estadio a definir');
+        const formattedDate = formatHubDate(m.date);
 
-        // Verificar Transmisión
+        // Forzar Basket.tv si es metro
+        let finalChannel = m.channel;
+        if (leagueKey === 'liga_metropolitana' && (!finalChannel || finalChannel.trim() === '')) {
+            finalChannel = 'Basket.tv';
+        }
+
         let channelInfoRow = '';
-        if (m.channel && m.channel.trim() !== '') {
+        if (finalChannel && finalChannel.trim() !== '') {
             const channels = db.channels || [];
-            const channelObj = channels.find(c => c.name === m.channel);
-            let channelDisplay = channelObj 
-                ? `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 25px; object-fit: contain; background: white; padding: 2px; border-radius: 4px; border: 1px solid var(--border-color);">` 
-                : `<span style="font-weight:900; color:var(--text-main); font-size: 1.1rem;">${m.channel}</span>`;
+            const channelObj = channels.find(c => c.name.toLowerCase() === finalChannel.toLowerCase());
+            let channelDisplay = '';
+            
+            if (channelObj) {
+                channelDisplay = `<img src="${channelObj.logo}" title="${channelObj.name}" style="height: 25px; object-fit: contain; background: white; padding: 2px; border-radius: 4px; border: 1px solid var(--border-color);">`;
+            } else if (finalChannel.toLowerCase() === 'basket.tv') {
+                // REGLA ESPECÍFICA PARA EL LOGO DE BASKET.TV EN EL MODAL DE INFO
+                channelDisplay = `<img src="assets/image/bpass.png" title="Basket.tv" style="height: 25px; object-fit: contain; background: white; padding: 2px; border-radius: 4px; border: 1px solid var(--border-color);">`;
+            } else {
+                channelDisplay = `<span style="font-weight:900; color:var(--text-main); font-size: 1.1rem;">${finalChannel}</span>`;
+            }
             
             channelInfoRow = `
             <div style="background: var(--bg-base); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; display:flex; align-items:center; gap:15px;">
@@ -317,7 +350,7 @@ window.openHubModal = (leagueKey, matchId, mode) => {
                 </div>
                 <div>
                     <span style="display:block; font-size:0.75rem; color:var(--cool-gray); font-weight:800; text-transform:uppercase;">Fecha y Hora</span>
-                    <span style="font-size:1.1rem; font-weight:900; color:var(--text-main);">${m.date} <span style="color:var(--cool-gray); font-weight:700; margin:0 5px;">|</span> ${m.time || '--:--'} Hs</span>
+                    <span style="font-size:1.1rem; font-weight:900; color:var(--text-main);">${formattedDate} <span style="color:var(--cool-gray); font-weight:700; margin:0 5px;">|</span> ${m.time || '--:--'} Hs</span>
                 </div>
             </div>
 
@@ -335,7 +368,7 @@ window.openHubModal = (leagueKey, matchId, mode) => {
 
         </div>`;
     } 
-    // 3. MODO STATS (Barras comparativas)
+    // 3. MODO STATS (Finalizado)
     else if (mode === 'stats' && config.hasStats) {
         const sH = (m.stats && m.stats.home) ? m.stats.home : {}; 
         const sA = (m.stats && m.stats.away) ? m.stats.away : {};
@@ -408,5 +441,4 @@ window.closeHubModal = () => {
     document.getElementById('hub-modal').classList.add('hidden');
 }
 
-// Iniciar Hub
 initHub();
