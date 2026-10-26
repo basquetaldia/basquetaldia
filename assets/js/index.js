@@ -16,7 +16,7 @@ const defaultLogo = "assets/image/favicon.png"
 
 // Configuración global de las ligas soportadas y sus enlaces
 const leagueConfig = {
-    "liga_nacional": { name: "Liga Nacional", hasStats: false, logo: "assets/image/lnb.svg?v=2", url: "liganacional.html" },
+    "liga_nacional": { name: "Liga Nacional", hasStats: false, logo: "assets/image/LNB.svg", url: "liganacional.html" },
     "liga_argentina": { name: "Liga Argentina", hasStats: false, logo: "assets/image/TNA.svg", url: "ligaargentina.html" },
     "liga_femenina": { name: "Liga Femenina", hasStats: false, logo: "assets/image/LFB.svg", url: "ligafemenina.html" },
     "liga_metropolitana": { name: "Liga Metropolitana", hasStats: true, logo: "assets/image/ligametro.png", url: "premetro.html" }
